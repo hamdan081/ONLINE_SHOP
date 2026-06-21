@@ -339,6 +339,16 @@
 
         function getDetailImagePath(imagePath) {
             if (!imagePath) return '../Assect/Img/backpack.png';
+            // Try to parse as JSON array (multiple images)
+            try {
+                const parsed = JSON.parse(imagePath);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    imagePath = parsed[0];
+                }
+            } catch (e) {
+                // Not JSON, continue with original value
+            }
+
             if (imagePath.startsWith('http')) return imagePath;
             if (imagePath.startsWith('/uploads')) return BASE_URL + imagePath;
             if (imagePath.startsWith('../')) {

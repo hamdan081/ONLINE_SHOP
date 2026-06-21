@@ -91,6 +91,16 @@
         // Helper: resolve any image value to a displayable URL
         function getImageUrl(image) {
             if (!image) return 'Assect/Img/backpack.png';
+            // Try to parse as JSON array (multiple images)
+            try {
+                const parsed = JSON.parse(image);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    image = parsed[0];
+                }
+            } catch (e) {
+                // Not JSON, continue with original value
+            }
+
             if (image.startsWith('http')) return image;
             if (image.startsWith('/uploads')) return BASE_URL + image;
             return image;

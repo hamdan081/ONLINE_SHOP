@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Produk - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../Assect/Css/style.css">
+    <link rel="stylesheet" href="../Assect/Css/toast.css">
+    <script src="../Assect/Js/toast.js"></script>
+    <style>
+        :root {
+            --admin-blue: #1F3C88;
+            --admin-green: #27AE60;
+            --admin-green-hover: #219653;
+            --danger: #EB5757;
+            --warning: #F2C94C;
+            --surface: #F6F8FB;
+            --card: #FFFFFF;
+            --text: #1E293B;
+            --muted: #64748B;
+            --line: #E2E8F0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", Arial, sans-serif;
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .admin-body {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--admin-blue);
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .sidebar-header svg {
+            color: #4ADE80;
+        }
+
+        .sidebar-brand {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .sidebar-menu {
+            padding: 18px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 24px;
+            color: rgba(255, 255, 255, 0.72);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-left: 4px solid transparent;
+            transition: 0.2s ease;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.11);
+        }
+
+        .menu-item.active {
+            border-left-color: #4ADE80;
+        }
+
+        .sidebar-footer {
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            display: grid;
+            gap: 10px;
+        }
+
+        .btn-exit-admin,
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.72);
+            text-decoration: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-exit-admin:hover {
+            color: #FFFFFF;
+        }
+
+        .btn-logout:hover {
+            color: #FCA5A5;
+        }
+
+        .main-content {
+            width: 100%;
+            padding: 34px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            overflow-x: hidden;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+        }
+
+        .content-title {
+            margin: 0;
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .content-subtitle {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-add {
+            padding: 12px 18px;
+            background: var(--admin-green);
+            color: #FFFFFF;
+            box-shadow: 0 12px 24px rgba(39, 174, 96, 0.18);
+            white-space: nowrap;
+        }
+
+        .btn-add:hover {
+            background: var(--admin-green-hover);
+            transform: translateY(-1px);
+        }
+
+        .state-message {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            border: 1px solid var(--line);
+            background: #FFFFFF;
+            color: var(--muted);
+        }
+
+        .state-message.show {
+            display: flex;
+        }
+
+        .state-message.success {
+            color: #166534;
+            background: #F0FDF4;
+            border-color: #BBF7D0;
+        }
+
+        .state-message.error {
+            color: #991B1B;
+            background: #FEF2F2;
+            border-color: #FECACA;
+        }
+
+        .table-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 16px 35px rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+        }
+
+        .table-toolbar {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .table-toolbar h2 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+        .table-toolbar span {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .product-controls {
+            padding: 18px 20px;
+            display: grid;
+            grid-template-columns: minmax(220px, 1.4fr) minmax(180px, 0.8fr) minmax(180px, 0.8fr) auto;
+            gap: 12px;
+            align-items: end;
+            border-bottom: 1px solid var(--line);
+            background: #FFFFFF;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .control-group label {
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .control-field {
+            width: 100%;
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font: inherit;
+            font-weight: 600;
+            color: var(--text);
+            background: #FFFFFF;
+            outline: none;
+        }
+
+        .control-field:focus {
+            border-color: var(--admin-blue);
+            box-shadow: 0 0 0 3px rgba(31, 60, 136, 0.12);
+        }
+
+        .btn-reset {
+            min-height: 42px;
+            padding: 10px 16px;
+            background: #F1F5F9;
+            color: #475569;
+            border: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        .btn-reset:hover {
+            background: #E2E8F0;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 920px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 14px 18px;
+            background: #F8FAFC;
+            color: var(--muted);
+            font-size: 0.78rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+            font-size: 0.94rem;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        tbody tr:hover td {
+            background: #FAFCFF;
+        }
+
+        .thumb-cell {
+            width: 82px;
+        }
+
+        .prod-thumb,
+        .preview-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            background: #F8FAFC;
+            display: block;
+        }
+
+        .prod-name {
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1.35;
+        }
+
+        .prod-description {
+            color: var(--muted);
+            line-height: 1.55;
+            max-width: 340px;
+        }
+
+        .prod-price {
+            color: var(--admin-green);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #EFF6FF;
+            color: #1D4ED8;
+            font-size: 0.82rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .action-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-table-action {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-table-action:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-table-action:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-table-action.is-loading {
+            width: auto;
+            min-width: 92px;
+            padding: 0 10px;
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+
+        .btn-edit {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .btn-delete {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        .empty-row {
+            text-align: center;
+            color: var(--muted);
+            font-weight: 700;
+            padding: 40px 18px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.46);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            width: min(680px, 100%);
+            max-height: 92vh;
+            overflow-y: auto;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #FFFFFF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 20px 22px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .btn-close-modal {
+            width: 36px;
+            height: 36px;
+            border: 0;
+            border-radius: 8px;
+            background: #F1F5F9;
+            color: var(--muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-form {
+            padding: 22px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            color: var(--text);
+            font-size: 0.88rem;
+            font-weight: 800;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 11px 12px;
+            font: inherit;
+            color: var(--text);
+            outline: none;
+            background: #FFFFFF;
+        }
+
+        .form-group textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--admin-blue);
+            box-shadow: 0 0 0 3px rgba(31, 60, 136, 0.12);
+        }
+
+        .field-error {
+            min-height: 18px;
+            color: #B91C1C;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .image-upload-section {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .image-upload-hint {
+            font-size: 0.82rem;
+            color: var(--muted);
+            padding: 8px 10px;
+            background: #F0F4FF;
+            border-radius: 6px;
+            border-left: 3px solid var(--admin-blue);
+        }
+
+        .upload-area {
+            position: relative;
+            border: 2px dashed #CBD5E1;
+            border-radius: 10px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            background: #FAFBFC;
+        }
+
+        .upload-area:hover {
+            border-color: var(--admin-blue);
+            background: #F0F4FF;
+        }
+
+        .upload-area.drag-over {
+            border-color: var(--admin-green);
+            background: #F0FDF4;
+            border-width: 2px;
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            color: var(--admin-blue);
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+
+        .upload-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #F8FAFC;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview-item .preview-placeholder {
+            color: var(--muted);
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 8px;
+        }
+
+        .image-preview-item .btn-remove-image {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 0;
+            background: rgba(255, 255, 255, 0.95);
+            color: #B91C1C;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .image-preview-item:hover .btn-remove-image {
+            opacity: 1;
+        }
+
+        .btn-remove-image:hover {
+            background: #FEE2E2;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 4px;
+        }
+
+        .btn-cancel,
+        .btn-submit {
+            padding: 11px 18px;
+        }
+
+        .btn-cancel {
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        .btn-submit {
+            background: var(--admin-blue);
+            color: #FFFFFF;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 860px) {
+            .admin-body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .sidebar-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 10px 12px;
+            }
+
+            .menu-item {
+                border-left: 0;
+                border-bottom: 3px solid transparent;
+                padding: 12px 14px;
+                white-space: nowrap;
+            }
+
+            .menu-item.active {
+                border-bottom-color: #4ADE80;
+            }
+
+            .main-content {
+                padding: 22px 16px;
+            }
+
+            .content-header,
+            .table-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .product-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-add {
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-footer {
+                flex-direction: column-reverse;
+            }
+
+            .btn-cancel,
+            .btn-submit {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield"></i>
+            <span class="sidebar-brand">Admin Panel</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="product.html" class="menu-item active">
+                <i data-lucide="package"></i>
+                <span>Produk</span>
+            </a>
+            <a href="order.html" class="menu-item">
+                <i data-lucide="shopping-cart"></i>
+                <span>Pesanan</span>
+            </a>
+            <a href="user.html" class="menu-item">
+                <i data-lucide="users"></i>
+                <span>User</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="../home.html" class="btn-exit-admin">
+                <i data-lucide="home"></i>
+                <span>Ke Marketplace</span>
+            </a>
+            <button type="button" class="btn-logout" id="logout-btn">
+                <i data-lucide="log-out"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1 class="content-title">Kelola Produk</h1>
+                <p class="content-subtitle">Tambah, edit, dan hapus produk marketplace dari data backend.</p>
+            </div>
+            <button class="btn btn-add" id="btn-tambah-produk" type="button">
+                <i data-lucide="plus"></i>
+                <span>Tambah Produk</span>
+            </button>
+        </header>
+
+        <div class="state-message" id="product-state"></div>
+
+        <section class="table-card">
+            <div class="table-toolbar">
+                <div>
+                    <h2>Daftar Produk</h2>
+                    <span id="product-count">0 produk</span>
+                </div>
+            </div>
+            <div class="product-controls">
+                <div class="control-group">
+                    <label for="search-product">Cari Produk</label>
+                    <input type="search" id="search-product" class="control-field" placeholder="Cari produk...">
+                </div>
+                <div class="control-group">
+                    <label for="filter-category">Filter Kategori</label>
+                    <select id="filter-category" class="control-field">
+                        <option value="all">Semua Kategori</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="sort-product">Urutkan</label>
+                    <select id="sort-product" class="control-field">
+                        <option value="default">Default</option>
+                        <option value="price-asc">Harga Termurah</option>
+                        <option value="price-desc">Harga Termahal</option>
+                        <option value="name-asc">Nama A-Z</option>
+                        <option value="name-desc">Nama Z-A</option>
+                        <option value="newest">Produk Terbaru</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-reset" id="reset-filter">
+                    <i data-lucide="rotate-ccw"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Gambar</th>
+                            <th>Nama Produk</th>
+                            <th>Kategori</th>
+                            <th>Deskripsi</th>
+                            <th>Harga</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="product-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Tambah Produk Baru</h3>
+                <button class="btn-close-modal" id="btn-close-modal" type="button" aria-label="Tutup form">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <form id="product-form" class="modal-form">
+                <input type="hidden" id="edit-product-id">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="input-name">Nama Produk</label>
+                        <input type="text" id="input-name" placeholder="Contoh: Wireless Keyboard">
+                        <small class="field-error" id="error-name"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-category">Kategori</label>
+                        <input type="text" id="input-category" placeholder="Contoh: Elektronik">
+                        <small class="field-error" id="error-category"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-price">Harga (Rp)</label>
+                        <input type="number" id="input-price" min="1" placeholder="Contoh: 150000">
+                        <small class="field-error" id="error-price"></small>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="input-description">Deskripsi Produk</label>
+                        <textarea id="input-description" placeholder="Tulis deskripsi singkat produk"></textarea>
+                        <small class="field-error" id="error-description"></small>
+                    </div>
+
+                    <div class="image-upload-section">
+                        <label>Gambar Produk (Opsional: Upload 1-5 gambar)</label>
+                        <div class="image-upload-hint">
+                            <i data-lucide="info" style="width:16px;height:16px;display:inline;margin-right:6px;vertical-align:text-bottom;"></i>
+                            Anda bisa upload hingga 5 gambar. Format: JPG, PNG, WEBP. Tidak ada batasan ukuran file.
+                        </div>
+                        <div class="upload-area" id="upload-area">
+                            <input type="file" id="input-image-files" accept="image/jpeg,image/png,image/webp" multiple>
+                            <div class="upload-icon"><i data-lucide="image-plus"></i></div>
+                            <div class="upload-label">Klik atau seret gambar ke sini</div>
+                            <div class="upload-hint">Pilih hingga 5 gambar sekaligus</div>
+                        </div>
+                        <small class="field-error" id="error-image"></small>
+                        
+                        <div id="images-preview-section" style="display: none;">
+                            <div style="margin-top: 12px; font-size: 0.85rem; color: var(--muted); font-weight: 700;">
+                                <span id="image-count-display">0</span> / 5 gambar dipilih
+                            </div>
+                            <div class="image-preview-grid" id="images-preview-grid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" id="btn-cancel-modal">Batal</button>
+                    <button type="submit" class="btn btn-submit" id="btn-submit-product">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:3000/api";
+        const BASE_URL = "http://localhost:3000";
+
+        const modalOverlay = document.getElementById("modal-overlay");
+        const productForm = document.getElementById("product-form");
+        const productState = document.getElementById("product-state");
+        const tableBody = document.getElementById("product-table-body");
+        const productCount = document.getElementById("product-count");
+        const submitButton = document.getElementById("btn-submit-product");
+        const searchProductInput = document.getElementById("search-product");
+        const filterCategorySelect = document.getElementById("filter-category");
+        const sortProductSelect = document.getElementById("sort-product");
+        const resetFilterButton = document.getElementById("reset-filter");
+
+        const editProductIdInput = document.getElementById("edit-product-id");
+        const nameInput = document.getElementById("input-name");
+        const categoryInput = document.getElementById("input-category");
+        const priceInput = document.getElementById("input-price");
+        const imageFilesInput = document.getElementById("input-image-files");
+        const descriptionInput = document.getElementById("input-description");
+        const uploadArea = document.getElementById("upload-area");
+        const imagesPreviewGrid = document.getElementById("images-preview-grid");
+        const imagesPreviewSection = document.getElementById("images-preview-section");
+        const imageCountDisplay = document.getElementById("image-count-display");
+
+        let allProducts = [];
+        let filteredProducts = [];
+        let selectedImageFiles = []; // Array of files
+        let editingOldImage = "";
+        const MAX_IMAGES = 5;
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0
+            }).format(Number(number) || 0);
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function truncateText(text, maxLength) {
+            const cleanText = String(text || "").trim();
+            if (!cleanText) return "-";
+            return cleanText.length > maxLength ? cleanText.slice(0, maxLength) + "..." : cleanText;
+        }
+
+        function getProductId(product) {
+            return product.produk_id || product.id;
+        }
+
+        function getProductName(product) {
+            return product.nama_barang || product.name || "";
+        }
+
+        function getProductDate(product) {
+            return product.created_at || product.createdAt || product.tanggal || product.updated_at || product.updatedAt || "";
+        }
+
+        // Helper: resolve any image value to a displayable URL
+        function getImageUrl(image) {
+            if (!image) return "";
+            
+            // Try to parse as JSON array (multiple images)
+            try {
+                const parsed = JSON.parse(image);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    image = parsed[0]; // Use first image
+                }
+            } catch (e) {
+                // Not JSON, continue with original value
+            }
+
+            if (image.startsWith("http")) return image;
+            if (image.startsWith("/uploads")) return BASE_URL + image;
+            if (image.startsWith("../") || image.startsWith("./")) return image;
+            return "../" + image;
+        }
+
+        function renderLoading() {
+            productState.className = "state-message show";
+            productState.innerHTML = '<div class="loading-spinner"></div><span>Memuat data produk...</span>';
+            lucide.createIcons();
+        }
+
+        function renderError(message = "Gagal memuat data produk. Pastikan server backend berjalan.") {
+            productState.className = "state-message show error";
+            productState.innerHTML = `<i data-lucide="alert-circle"></i><span>${escapeHTML(message)}</span>`;
+            lucide.createIcons();
+        }
+
+        function renderMessage(message, type = "success") {
+            productState.className = `state-message show ${type}`;
+            productState.innerHTML = `<i data-lucide="${type === "success" ? "check-circle-2" : "alert-circle"}"></i><span>${escapeHTML(message)}</span>`;
+            lucide.createIcons();
+            if (window.showToast) {
+                showToast(message, type);
+            }
+        }
+
+        function hideState() {
+            productState.className = "state-message";
+            productState.innerHTML = "";
+        }
+
+        async function fetchProducts() {
+            renderLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const data = await response.json();
+
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.message || "Gagal memuat data produk.");
+                }
+
+                allProducts = Array.isArray(data.products) ? data.products : [];
+                populateCategoryFilter(allProducts);
+                applyProductFilters();
+                hideState();
+            } catch (error) {
+                allProducts = [];
+                filteredProducts = [];
+                populateCategoryFilter(allProducts);
+                renderProducts(filteredProducts);
+                renderError();
+            }
+        }
+
+        function populateCategoryFilter(products) {
+            const selectedCategory = filterCategorySelect.value;
+            const categories = [...new Set(products
+                .map((product) => String(product.kategori || "").trim())
+                .filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, "id-ID"));
+
+            filterCategorySelect.innerHTML = '<option value="all">Semua Kategori</option>';
+            categories.forEach((category) => {
+                filterCategorySelect.insertAdjacentHTML("beforeend", `<option value="${escapeHTML(category)}">${escapeHTML(category)}</option>`);
+            });
+
+            if (selectedCategory && categories.includes(selectedCategory)) {
+                filterCategorySelect.value = selectedCategory;
+            }
+        }
+
+        function applyProductFilters() {
+            const keyword = searchProductInput.value.trim().toLowerCase();
+            const selectedCategory = filterCategorySelect.value;
+            const sortBy = sortProductSelect.value;
+
+            filteredProducts = allProducts.filter((product) => {
+                const name = String(getProductName(product)).toLowerCase();
+                const category = String(product.kategori || "").toLowerCase();
+                const description = String(product.deskripsi || product.description || "").toLowerCase();
+                const matchKeyword = !keyword || name.includes(keyword) || category.includes(keyword) || description.includes(keyword);
+                const matchCategory = selectedCategory === "all" || String(product.kategori || "") === selectedCategory;
+
+                return matchKeyword && matchCategory;
+            });
+
+            filteredProducts.sort((a, b) => {
+                const priceA = Number(a.harga || a.price || 0);
+                const priceB = Number(b.harga || b.price || 0);
+                const nameA = getProductName(a);
+                const nameB = getProductName(b);
+
+                if (sortBy === "price-asc") return priceA - priceB;
+                if (sortBy === "price-desc") return priceB - priceA;
+                if (sortBy === "name-asc") return nameA.localeCompare(nameB, "id-ID");
+                if (sortBy === "name-desc") return nameB.localeCompare(nameA, "id-ID");
+                if (sortBy === "newest") {
+                    const dateA = new Date(getProductDate(a)).getTime() || 0;
+                    const dateB = new Date(getProductDate(b)).getTime() || 0;
+                    return dateB - dateA;
+                }
+
+                return 0;
+            });
+
+            renderProducts(filteredProducts);
+        }
+
+        function resetProductFilters() {
+            searchProductInput.value = "";
+            filterCategorySelect.value = "all";
+            sortProductSelect.value = "default";
+            applyProductFilters();
+        }
+
+        function renderEmptyState(message) {
+            tableBody.innerHTML = `<tr><td colspan="6" class="empty-row">${escapeHTML(message)}</td></tr>`;
+        }
+
+        function renderProducts(products) {
+            productCount.textContent = `Menampilkan ${products.length} dari ${allProducts.length} produk`;
+            tableBody.innerHTML = "";
+
+            if (!products.length) {
+                renderEmptyState(allProducts.length ? "Produk tidak ditemukan." : "Belum ada produk.");
+                return;
+            }
+
+            products.forEach((product) => {
+                const productId = getProductId(product);
+                const imageSrc = getImageUrl(product.image || product.gambar);
+                const imageContent = imageSrc
+                    ? `<img src="${escapeHTML(imageSrc)}" alt="${escapeHTML(product.nama_barang || product.name || "Produk")}" class="prod-thumb" onerror="this.replaceWith(document.createTextNode('Tidak ada gambar'))">`
+                    : "Tidak ada gambar";
+
+                tableBody.insertAdjacentHTML("beforeend", `
+                    <tr>
+                        <td class="thumb-cell">${imageContent}</td>
+                        <td>
+                            <div class="prod-name">${escapeHTML(getProductName(product) || "-")}</div>
+                        </td>
+                        <td><span class="category-badge">${escapeHTML(product.kategori || "-")}</span></td>
+                        <td class="prod-description">${escapeHTML(truncateText(product.deskripsi || product.description, 90))}</td>
+                        <td class="prod-price">${formatRupiah(product.harga || product.price)}</td>
+                        <td>
+                            <div class="action-cell">
+                                <button class="btn-table-action btn-edit" type="button" onclick="openEditFormById('${escapeHTML(productId)}')" title="Edit produk">
+                                    <i data-lucide="edit-3"></i>
+                                </button>
+                                <button class="btn-table-action btn-delete" type="button" onclick="deleteProduct('${escapeHTML(productId)}', this)" title="Hapus produk">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            lucide.createIcons();
+        }
+
+        function clearErrors() {
+            ["name", "category", "price", "image", "description"].forEach((field) => {
+                document.getElementById(`error-${field}`).textContent = "";
+            });
+        }
+
+        function setError(field, message) {
+            document.getElementById(`error-${field}`).textContent = message;
+        }
+
+        // Validate selected image file
+        function validateImageFile(file) {
+            if (!file) return true;
+            const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+            if (!allowedTypes.includes(file.type)) {
+                if (window.showToast) showToast("Format gambar tidak didukung. Gunakan JPG, PNG, atau WEBP.", "error");
+                setError("image", "Format gambar tidak didukung.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateProductForm() {
+            clearErrors();
+            let isValid = true;
+            const price = Number(priceInput.value);
+
+            if (!nameInput.value.trim()) {
+                setError("name", "Nama produk wajib diisi.");
+                isValid = false;
+            }
+
+            if (!categoryInput.value.trim()) {
+                setError("category", "Kategori wajib diisi.");
+                isValid = false;
+            }
+
+            if (!priceInput.value || price <= 0) {
+                setError("price", "Harga wajib diisi dan harus lebih dari 0.");
+                isValid = false;
+            }
+
+            // Validate image files
+            if (selectedImageFiles.length > 0) {
+                for (let file of selectedImageFiles) {
+                    if (!validateImageFile(file)) {
+                        isValid = false;
+                        break;
+                    }
+                }
+            }
+
+            return isValid;
+        }
+
+        // Preview images from file input
+        function previewImagesFromFiles() {
+            imagesPreviewGrid.innerHTML = "";
+            
+            if (selectedImageFiles.length === 0) {
+                imagesPreviewSection.style.display = "none";
+                return;
+            }
+
+            imagesPreviewSection.style.display = "block";
+            imageCountDisplay.textContent = selectedImageFiles.length;
+
+            selectedImageFiles.forEach((file, index) => {
+                const objectUrl = URL.createObjectURL(file);
+                const previewItem = document.createElement("div");
+                previewItem.className = "image-preview-item";
+                
+                const img = document.createElement("img");
+                img.src = objectUrl;
+                img.alt = `Preview ${index + 1}`;
+                
+                const btnRemove = document.createElement("button");
+                btnRemove.type = "button";
+                btnRemove.className = "btn-remove-image";
+                btnRemove.innerHTML = '<i data-lucide="x"></i>';
+                btnRemove.onclick = (e) => {
+                    e.preventDefault();
+                    removeImageAt(index);
+                };
+
+                previewItem.appendChild(img);
+                previewItem.appendChild(btnRemove);
+                imagesPreviewGrid.appendChild(previewItem);
+                
+                lucide.createIcons();
+            });
+        }
+
+        // Remove image from selected files
+        function removeImageAt(index) {
+            selectedImageFiles.splice(index, 1);
+            imageFilesInput.value = "";
+            previewImagesFromFiles();
+        }
+
+        // Handle multiple file selection
+        function handleFilesSelect(e) {
+            let files = Array.from(e.target.files || []);
+            
+            if (files.length === 0) {
+                selectedImageFiles = [];
+                previewImagesFromFiles();
+                return;
+            }
+
+            // Limit to 5 files total
+            if (files.length + selectedImageFiles.length > MAX_IMAGES) {
+                setError("image", `Maksimal ${MAX_IMAGES} gambar. Anda sudah memilih ${selectedImageFiles.length} gambar.`);
+                imageFilesInput.value = "";
+                return;
+            }
+
+            // Validate each file
+            for (let file of files) {
+                if (!validateImageFile(file)) {
+                    imageFilesInput.value = "";
+                    return;
+                }
+            }
+
+            // Add files to selected array
+            selectedImageFiles = [...selectedImageFiles, ...files];
+            clearErrors();
+            previewImagesFromFiles();
+        }
+
+        // Drag & drop support
+        uploadArea.addEventListener("dragover", function (e) {
+            e.preventDefault();
+            uploadArea.classList.add("drag-over");
+        });
+        uploadArea.addEventListener("dragleave", function () {
+            uploadArea.classList.remove("drag-over");
+        });
+        uploadArea.addEventListener("drop", function (e) {
+            e.preventDefault();
+            uploadArea.classList.remove("drag-over");
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length > 0) {
+                const dt = new DataTransfer();
+                files.forEach(file => dt.items.add(file));
+                imageFilesInput.files = dt.files;
+                handleFilesSelect({ target: imageFilesInput });
+            }
+        });
+
+        function openAddForm() {
+            document.getElementById("modal-title").textContent = "Tambah Produk Baru";
+            productForm.reset();
+            editProductIdInput.value = "";
+            selectedImageFiles = [];
+            editingOldImage = "";
+            clearErrors();
+            previewImagesFromFiles();
+            modalOverlay.classList.add("show");
+            lucide.createIcons();
+        }
+
+        function openEditForm(product) {
+            document.getElementById("modal-title").textContent = "Edit Produk";
+            clearErrors();
+            editProductIdInput.value = getProductId(product);
+            nameInput.value = product.nama_barang || product.name || "";
+            categoryInput.value = product.kategori || "";
+            priceInput.value = product.harga || product.price || "";
+            descriptionInput.value = product.deskripsi || product.description || "";
+
+            // Store old image for fallback
+            editingOldImage = product.image || product.gambar || "";
+            selectedImageFiles = [];
+            imageFilesInput.value = "";
+            previewImagesFromFiles();
+            
+            modalOverlay.classList.add("show");
+            lucide.createIcons();
+        }
+
+        window.openEditFormById = function (id) {
+            const product = allProducts.find((item) => String(getProductId(item)) === String(id));
+            if (product) {
+                openEditForm(product);
+            }
+        };
+
+        function closeModal() {
+            modalOverlay.classList.remove("show");
+        }
+
+        async function submitProductForm(event) {
+            event.preventDefault();
+
+            if (!validateProductForm()) {
+                return;
+            }
+
+            const targetId = editProductIdInput.value;
+            const isEditing = Boolean(targetId);
+            const currentUser = JSON.parse(localStorage.getItem("currentUser") || localStorage.getItem("user") || "{}");
+
+            // Build FormData instead of JSON
+            const formData = new FormData();
+            formData.append("nama_barang", nameInput.value.trim());
+            formData.append("kategori", categoryInput.value.trim());
+            formData.append("harga", Number(priceInput.value));
+            formData.append("deskripsi", descriptionInput.value.trim());
+
+            if (!isEditing) {
+                formData.append("user_id", currentUser.id || currentUser.user_id || 1);
+            }
+
+            // Append all image files
+            if (selectedImageFiles.length > 0) {
+                selectedImageFiles.forEach((file, index) => {
+                    formData.append(`images`, file);
+                });
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Menyimpan...";
+
+            try {
+                const response = await fetch(isEditing ? `${API_BASE}/products/${targetId}` : `${API_BASE}/products`, {
+                    method: isEditing ? "PUT" : "POST",
+                    body: formData
+                    // Do NOT set Content-Type header — browser auto-sets multipart/form-data with boundary
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.message || "Gagal menyimpan produk.");
+                }
+
+                await fetchProducts();
+                closeModal();
+                renderMessage(isEditing ? "Produk berhasil diperbarui." : "Produk berhasil ditambahkan.");
+            } catch (error) {
+                renderMessage("Gagal menyimpan produk. Pastikan server backend berjalan.", "error");
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = "Simpan";
+            }
+        }
+
+        window.deleteProduct = async function (id, button) {
+            const product = allProducts.find((item) => String(getProductId(item)) === String(id));
+            const productName = product ? product.nama_barang || product.name || "produk ini" : "produk ini";
+
+            if (!confirm(`Hapus ${productName}?`)) {
+                return;
+            }
+
+            if (button) {
+                button.disabled = true;
+                button.classList.add("is-loading");
+                button.textContent = "Memproses...";
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/products/${id}`, { method: "DELETE" });
+                const data = await response.json();
+
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.message || "Gagal menghapus produk.");
+                }
+
+                await fetchProducts();
+                renderMessage("Produk berhasil dihapus.");
+            } catch (error) {
+                renderError("Gagal menghapus produk. Pastikan server backend berjalan.");
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.classList.remove("is-loading");
+                    button.innerHTML = '<i data-lucide="trash-2"></i>';
+                    lucide.createIcons();
+                }
+            }
+        };
+
+        document.getElementById("btn-tambah-produk").addEventListener("click", openAddForm);
+        document.getElementById("btn-close-modal").addEventListener("click", closeModal);
+        document.getElementById("btn-cancel-modal").addEventListener("click", closeModal);
+        productForm.addEventListener("submit", submitProductForm);
+        imageFilesInput.addEventListener("change", handleFilesSelect);
+        searchProductInput.addEventListener("input", applyProductFilters);
+        filterCategorySelect.addEventListener("change", applyProductFilters);
+        sortProductSelect.addEventListener("change", applyProductFilters);
+        resetFilterButton.addEventListener("click", resetProductFilters);
+        modalOverlay.addEventListener("click", function (event) {
+            if (event.target === modalOverlay) {
+                closeModal();
+            }
+        });
+
+        document.getElementById("logout-btn").addEventListener("click", function () {
+            localStorage.removeItem("currentUser");
+            localStorage.removeItem("user");
+            window.location.href = "../login.html";
+        });
+
+        lucide.createIcons();
+        fetchProducts();
+    </script>
+</body>
+</html>

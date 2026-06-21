@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../Assect/Css/style.css">
+    <link rel="stylesheet" href="../Assect/Css/toast.css">
+    <script src="../Assect/Js/toast.js"></script>
+    <style>
+        .admin-body {
+            background-color: var(--bg-surface);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: #1F3C88;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            gap: 4px;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 24px;
+            color: rgba(255, 255, 255, 0.72);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover {
+            color: #FFFFFF;
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .menu-item.active {
+            color: #FFFFFF;
+            background-color: rgba(255, 255, 255, 0.12);
+            border-left-color: #4ADE80;
+            font-weight: 800;
+        }
+
+        .menu-item svg,
+        .sidebar-header svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar-footer {
+            padding: 18px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: grid;
+            gap: 12px;
+        }
+
+        .btn-exit-admin {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.72);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-exit-admin:hover {
+            color: #FFFFFF;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            max-width: calc(100% - 260px);
+            padding: 34px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .content-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .content-subtitle {
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .dashboard-state {
+            display: none;
+            border-radius: 12px;
+            padding: 14px 16px;
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-light);
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .dashboard-state.show {
+            display: block;
+        }
+
+        .dashboard-state.error {
+            color: #B42318;
+            background-color: #FEF3F2;
+            border-color: #FECDCA;
+        }
+
+        .shortcut-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .shortcut-btn {
+            min-height: 40px;
+            padding: 10px 14px;
+            border-radius: 9px;
+            background-color: #FFFFFF;
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.88rem;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
+        }
+
+        .shortcut-btn:hover {
+            color: var(--primary);
+            border-color: rgba(47, 128, 237, 0.45);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .stats-card,
+        .dashboard-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .stats-card {
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stats-icon-box {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stats-icon-box.products { background-color: #EFF6FF; color: #2F80ED; }
+        .stats-icon-box.users { background-color: #F0FDF4; color: #27AE60; }
+        .stats-icon-box.orders { background-color: #FEF3C7; color: #D97706; }
+        .stats-icon-box.revenue { background-color: #ECFDF3; color: #047857; }
+        .stats-icon-box.processing { background-color: #FFF7ED; color: #EA580C; }
+        .stats-icon-box.done { background-color: #F0FDF4; color: #16A34A; }
+
+        .stats-icon-box svg {
+            width: 23px;
+            height: 23px;
+        }
+
+        .stats-label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .stats-value {
+            color: var(--text-dark);
+            font-size: 1.45rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+            gap: 18px;
+        }
+
+        .dashboard-card {
+            padding: 20px;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--text-dark);
+            font-size: 1.08rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .card-title svg {
+            width: 19px;
+            height: 19px;
+            color: var(--primary);
+        }
+
+        .status-summary {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .status-mini-card {
+            border-radius: 12px;
+            padding: 13px;
+            border: 1px solid var(--border-light);
+            background-color: #F8FAFC;
+        }
+
+        .status-label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .status-count {
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .recent-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .order-row,
+        .product-row {
+            display: grid;
+            gap: 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 13px;
+            background-color: #FFFFFF;
+        }
+
+        .order-row {
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+        }
+
+        .product-row {
+            grid-template-columns: 58px minmax(0, 1fr) auto;
+            align-items: center;
+        }
+
+        .row-title {
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        .row-meta {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .row-price {
+            color: var(--success);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .product-thumb {
+            width: 58px;
+            height: 58px;
+            border-radius: 10px;
+            object-fit: cover;
+            background-color: #F8FAFC;
+            border: 1px solid var(--border-light);
+        }
+
+        .status-badge {
+            border-radius: 999px;
+            padding: 6px 9px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .status-diproses,
+        .status-menunggu { background-color: #FEF3C7; color: #92400E; }
+        .status-dikirim { background-color: #DBEAFE; color: #1D4ED8; }
+        .status-selesai { background-color: #DCFCE7; color: #15803D; }
+        .status-dibatalkan { background-color: #FEE2E2; color: #B42318; }
+        .status-netral { background-color: #F1F5F9; color: #475569; }
+
+        .empty-text {
+            color: var(--text-muted);
+            font-weight: 700;
+            text-align: center;
+            padding: 18px;
+            border: 1px dashed var(--border-light);
+            border-radius: 12px;
+            background-color: #F8FAFC;
+        }
+
+        @media (max-width: 980px) {
+            .stats-grid,
+            .dashboard-grid,
+            .status-summary {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .main-content {
+                max-width: 100%;
+                padding: 22px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .stats-grid,
+            .dashboard-grid,
+            .status-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .content-header {
+                flex-direction: column;
+            }
+
+            .order-row,
+            .product-row {
+                grid-template-columns: 1fr;
+            }
+
+            .product-thumb {
+                width: 100%;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield" style="color: #4ADE80;"></i>
+            <span class="sidebar-brand">Admin Panel</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item active">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="product.html" class="menu-item">
+                <i data-lucide="package"></i>
+                <span>Produk</span>
+            </a>
+            <a href="order.html" class="menu-item">
+                <i data-lucide="shopping-cart"></i>
+                <span>Pesanan</span>
+            </a>
+            <a href="user.html" class="menu-item">
+                <i data-lucide="users"></i>
+                <span>User</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="../home.html" class="btn-exit-admin">
+                <i data-lucide="home"></i>
+                <span>Kembali ke Home</span>
+            </a>
+            <button class="btn-exit-admin" id="logoutButton">
+                <i data-lucide="log-out"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1 class="content-title">Dashboard Admin</h1>
+                <p class="content-subtitle">Pantau ringkasan produk, user, pesanan, dan pendapatan marketplace.</p>
+            </div>
+            <div class="shortcut-actions">
+                <a href="product.html" class="shortcut-btn"><i data-lucide="package-plus"></i>Kelola Produk</a>
+                <a href="order.html" class="shortcut-btn"><i data-lucide="list-checks"></i>Lihat Pesanan</a>
+                <a href="user.html" class="shortcut-btn"><i data-lucide="users"></i>Kelola User</a>
+            </div>
+        </header>
+
+        <div id="dashboardState" class="dashboard-state show">
+            <div class="loading-spinner"></div>
+            <p>Memuat data dashboard...</p>
+        </div>
+
+        <section class="stats-grid" id="statsGrid"></section>
+
+        <section class="dashboard-card">
+            <h2 class="card-title">
+                <i data-lucide="activity"></i>
+                <span>Ringkasan Status Pesanan</span>
+            </h2>
+            <div class="status-summary" id="statusSummary"></div>
+        </section>
+
+        <section class="dashboard-grid">
+            <article class="dashboard-card">
+                <h2 class="card-title">
+                    <i data-lucide="shopping-bag"></i>
+                    <span>Pesanan Terbaru</span>
+                </h2>
+                <div class="recent-list" id="recentOrders"></div>
+            </article>
+
+            <article class="dashboard-card">
+                <h2 class="card-title">
+                    <i data-lucide="package"></i>
+                    <span>Produk Terbaru</span>
+                </h2>
+                <div class="recent-list" id="recentProducts"></div>
+            </article>
+        </section>
+    </main>
+
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        const API_BASE = "http://localhost:3000/api";
+        const dashboardState = document.getElementById('dashboardState');
+        const statsGrid = document.getElementById('statsGrid');
+        const statusSummary = document.getElementById('statusSummary');
+        const recentOrders = document.getElementById('recentOrders');
+        const recentProducts = document.getElementById('recentProducts');
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0
+            }).format(number || 0);
+        }
+
+        function escapeHTML(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getImagePath(imagePath) {
+            if (!imagePath) return "../Assect/Img/avatar.png";
+            if (imagePath.startsWith('http') || imagePath.startsWith('/') || imagePath.startsWith('../')) return imagePath;
+            return '../' + imagePath;
+        }
+
+        function renderLoading() {
+            dashboardState.innerHTML = '<div class="loading-spinner"></div><p>Memuat data dashboard...</p>';
+            dashboardState.className = 'dashboard-state show';
+        }
+
+        function renderError() {
+            dashboardState.textContent = 'Gagal memuat data dashboard. Pastikan server backend sudah berjalan.';
+            dashboardState.className = 'dashboard-state show error';
+        }
+
+        function hideState() {
+            dashboardState.className = 'dashboard-state';
+        }
+
+        function calculateRevenue(orders) {
+            return orders.reduce((total, order) => total + (parseFloat(order.total || order.total_harga) || 0), 0);
+        }
+
+        function countStatus(orders, keyword) {
+            return orders.filter(order => String(order.status || '').toLowerCase().includes(keyword)).length;
+        }
+
+        function getStatusClass(status) {
+            const value = String(status || '').toLowerCase();
+            if (value.includes('selesai')) return 'status-selesai';
+            if (value.includes('kirim')) return 'status-dikirim';
+            if (value.includes('batal')) return 'status-dibatalkan';
+            if (value.includes('menunggu')) return 'status-menunggu';
+            if (value.includes('proses')) return 'status-diproses';
+            return 'status-netral';
+        }
+
+        async function fetchDashboardData() {
+            renderLoading();
+
+            try {
+                const [productsRes, usersRes, ordersRes] = await Promise.all([
+                    fetch(`${API_BASE}/products`),
+                    fetch(`${API_BASE}/users/all`),
+                    fetch(`${API_BASE}/orders/all`)
+                ]);
+
+                const [productsData, usersData, ordersData] = await Promise.all([
+                    productsRes.json(),
+                    usersRes.json(),
+                    ordersRes.json()
+                ]);
+
+                if (!productsRes.ok || !usersRes.ok || !ordersRes.ok ||
+                    !productsData.success || !usersData.success || !ordersData.success) {
+                    throw new Error('Gagal memuat data dashboard.');
+                }
+
+                const products = productsData.products || [];
+                const users = usersData.users || [];
+                const orders = ordersData.orders || [];
+
+                renderStats(products, users, orders);
+                renderStatusSummary(orders);
+                renderRecentOrders(orders);
+                renderRecentProducts(products);
+                hideState();
+                if (window.lucide) lucide.createIcons();
+            } catch (error) {
+                statsGrid.innerHTML = '';
+                statusSummary.innerHTML = '';
+                recentOrders.innerHTML = '';
+                recentProducts.innerHTML = '';
+                renderError();
+            }
+        }
+
+        function renderStats(products, users, orders) {
+            const stats = [
+                { label: 'Total Produk', value: products.length, icon: 'package', type: 'products' },
+                { label: 'Total User', value: users.length, icon: 'users', type: 'users' },
+                { label: 'Total Pesanan', value: orders.length, icon: 'shopping-bag', type: 'orders' },
+                { label: 'Total Pendapatan', value: formatRupiah(calculateRevenue(orders)), icon: 'wallet', type: 'revenue' },
+                { label: 'Pesanan Diproses', value: countStatus(orders, 'proses'), icon: 'loader-circle', type: 'processing' },
+                { label: 'Pesanan Selesai', value: countStatus(orders, 'selesai'), icon: 'check-circle', type: 'done' }
+            ];
+
+            statsGrid.innerHTML = stats.map(stat => `
+                <article class="stats-card">
+                    <div class="stats-icon-box ${stat.type}">
+                        <i data-lucide="${stat.icon}"></i>
+                    </div>
+                    <div>
+                        <span class="stats-label">${stat.label}</span>
+                        <span class="stats-value">${stat.value}</span>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function renderStatusSummary(orders) {
+            const statuses = [
+                { label: 'Menunggu', count: countStatus(orders, 'menunggu') },
+                { label: 'Diproses', count: countStatus(orders, 'proses') },
+                { label: 'Dikirim', count: countStatus(orders, 'kirim') },
+                { label: 'Selesai', count: countStatus(orders, 'selesai') },
+                { label: 'Dibatalkan', count: countStatus(orders, 'batal') }
+            ];
+
+            statusSummary.innerHTML = statuses.map(item => `
+                <div class="status-mini-card">
+                    <span class="status-label">${item.label}</span>
+                    <span class="status-count">${item.count}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderRecentOrders(orders) {
+            const latestOrders = orders.slice(0, 5);
+            if (latestOrders.length === 0) {
+                recentOrders.innerHTML = '<div class="empty-text">Belum ada pesanan.</div>';
+                return;
+            }
+
+            recentOrders.innerHTML = latestOrders.map(order => `
+                <article class="order-row">
+                    <div>
+                        <div class="row-title">${escapeHTML(order.id || '-')}</div>
+                        <div class="row-meta">${escapeHTML(order.customer || 'Customer')} - ${escapeHTML(order.date || '-')}</div>
+                        <div class="row-meta">${escapeHTML(order.itemsSummary || 'Detail item tidak tersedia')}</div>
+                    </div>
+                    <div style="display: grid; gap: 8px; justify-items: end;">
+                        <span class="row-price">${formatRupiah(order.total)}</span>
+                        <span class="status-badge ${getStatusClass(order.status)}">${escapeHTML(order.status || '-')}</span>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function renderRecentProducts(products) {
+            const latestProducts = [...products].slice(-5).reverse();
+            if (latestProducts.length === 0) {
+                recentProducts.innerHTML = '<div class="empty-text">Belum ada produk.</div>';
+                return;
+            }
+
+            recentProducts.innerHTML = latestProducts.map(product => `
+                <article class="product-row">
+                    <img src="${escapeHTML(getImagePath(product.image))}" alt="${escapeHTML(product.nama_barang || 'Produk')}" class="product-thumb">
+                    <div>
+                        <div class="row-title">${escapeHTML(product.nama_barang || 'Produk tanpa nama')}</div>
+                        <div class="row-meta">${escapeHTML(product.kategori || 'Tanpa kategori')}</div>
+                    </div>
+                    <span class="row-price">${formatRupiah(parseInt(product.harga) || 0)}</span>
+                </article>
+            `).join('');
+        }
+
+        document.getElementById('logoutButton').addEventListener('click', function () {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('user');
+            window.location.href = '../login.html';
+        });
+
+        fetchDashboardData();
+    </script>
+</body>
+</html>

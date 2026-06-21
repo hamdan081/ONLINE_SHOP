@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pesanan - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../Assect/Css/style.css">
+    <link rel="stylesheet" href="../Assect/Css/toast.css">
+    <script src="../Assect/Js/toast.js"></script>
+    <style>
+        :root {
+            --admin-blue: #1F3C88;
+            --admin-green: #27AE60;
+            --surface: #F6F8FB;
+            --card: #FFFFFF;
+            --text: #1E293B;
+            --muted: #64748B;
+            --line: #E2E8F0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", Arial, sans-serif;
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .admin-body {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--admin-blue);
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .sidebar-header svg {
+            color: #4ADE80;
+        }
+
+        .sidebar-brand {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .sidebar-menu {
+            padding: 18px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 24px;
+            color: rgba(255, 255, 255, 0.72);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-left: 4px solid transparent;
+            transition: 0.2s ease;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.11);
+        }
+
+        .menu-item.active {
+            border-left-color: #4ADE80;
+        }
+
+        .sidebar-footer {
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            display: grid;
+            gap: 10px;
+        }
+
+        .btn-exit-admin,
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.72);
+            text-decoration: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-exit-admin:hover {
+            color: #FFFFFF;
+        }
+
+        .btn-logout:hover {
+            color: #FCA5A5;
+        }
+
+        .main-content {
+            width: 100%;
+            padding: 34px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            overflow-x: hidden;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+        }
+
+        .content-title {
+            margin: 0;
+            font-size: 1.9rem;
+            font-weight: 800;
+        }
+
+        .content-subtitle {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .state-message {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            border: 1px solid var(--line);
+            background: #FFFFFF;
+            color: var(--muted);
+        }
+
+        .state-message.show {
+            display: flex;
+        }
+
+        .state-message.error {
+            color: #991B1B;
+            background: #FEF2F2;
+            border-color: #FECACA;
+        }
+
+        .table-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 16px 35px rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+        }
+
+        .table-toolbar {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            align-items: center;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .table-toolbar h2 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+        .table-toolbar span {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .order-controls {
+            padding: 18px 20px;
+            display: grid;
+            grid-template-columns: minmax(220px, 1.3fr) minmax(170px, 0.8fr) minmax(170px, 0.8fr) auto;
+            gap: 12px;
+            align-items: end;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .control-group label {
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .control-field {
+            width: 100%;
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font: inherit;
+            font-weight: 600;
+            color: var(--text);
+            background: #FFFFFF;
+            outline: none;
+        }
+
+        .control-field:focus {
+            border-color: var(--admin-blue);
+            box-shadow: 0 0 0 3px rgba(31, 60, 136, 0.12);
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-reset {
+            min-height: 42px;
+            padding: 10px 16px;
+            background: #F1F5F9;
+            color: #475569;
+            border: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        .btn-reset:hover {
+            background: #E2E8F0;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1080px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 14px 18px;
+            background: #F8FAFC;
+            color: var(--muted);
+            font-size: 0.78rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+            font-size: 0.94rem;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        tbody tr:hover td {
+            background: #FAFCFF;
+        }
+
+        .order-id,
+        .total-price {
+            font-weight: 800;
+        }
+
+        .total-price {
+            color: var(--admin-green);
+            white-space: nowrap;
+        }
+
+        .muted-text {
+            color: var(--muted);
+            font-size: 0.84rem;
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .status-menunggu,
+        .status-diproses,
+        .status-belum-dibayar { background: #FEF3C7; color: #92400E; }
+        .status-dikirim { background: #DBEAFE; color: #1D4ED8; }
+        .status-selesai,
+        .status-sudah-dibayar,
+        .status-lunas { background: #DCFCE7; color: #15803D; }
+        .status-dibatalkan,
+        .status-gagal { background: #FEE2E2; color: #B91C1C; }
+        .status-refund { background: #F3E8FF; color: #7E22CE; }
+        .status-netral { background: #F1F5F9; color: #475569; }
+
+        .detail-btn {
+            padding: 9px 12px;
+            background: var(--admin-blue);
+            color: #FFFFFF;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .detail-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(31, 60, 136, 0.16);
+        }
+
+        .empty-row {
+            padding: 42px 18px;
+            color: var(--muted);
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            padding: 18px;
+            background: rgba(15, 23, 42, 0.46);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            width: min(820px, 100%);
+            max-height: 92vh;
+            overflow-y: auto;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #FFFFFF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 20px 22px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .btn-close-modal {
+            width: 36px;
+            height: 36px;
+            border: 0;
+            border-radius: 8px;
+            background: #F1F5F9;
+            color: var(--muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 22px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .detail-line {
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #F8FAFC;
+            display: grid;
+            gap: 6px;
+        }
+
+        .detail-line span {
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .detail-line strong {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .detail-section-title {
+            margin: 2px 0 0;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .item-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: 54px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+        }
+
+        .item-thumb {
+            width: 54px;
+            height: 54px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            background: #F8FAFC;
+        }
+
+        .item-name {
+            font-weight: 800;
+        }
+
+        .item-meta {
+            color: var(--muted);
+            font-size: 0.84rem;
+            margin-top: 4px;
+        }
+
+        .item-subtotal {
+            font-weight: 800;
+            color: var(--admin-green);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 860px) {
+            .admin-body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .sidebar-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 10px 12px;
+            }
+
+            .menu-item {
+                border-left: 0;
+                border-bottom: 3px solid transparent;
+                padding: 12px 14px;
+                white-space: nowrap;
+            }
+
+            .menu-item.active {
+                border-bottom-color: #4ADE80;
+            }
+
+            .main-content {
+                padding: 22px 16px;
+            }
+
+            .content-header,
+            .table-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .order-controls,
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-reset {
+                width: 100%;
+            }
+
+            .item-row {
+                grid-template-columns: 48px 1fr;
+            }
+
+            .item-subtotal {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield"></i>
+            <span class="sidebar-brand">Admin Panel</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="product.html" class="menu-item">
+                <i data-lucide="package"></i>
+                <span>Produk</span>
+            </a>
+            <a href="order.html" class="menu-item active">
+                <i data-lucide="shopping-cart"></i>
+                <span>Pesanan</span>
+            </a>
+            <a href="user.html" class="menu-item">
+                <i data-lucide="users"></i>
+                <span>User</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="../home.html" class="btn-exit-admin">
+                <i data-lucide="home"></i>
+                <span>Ke Marketplace</span>
+            </a>
+            <button type="button" class="btn-logout" id="logout-btn">
+                <i data-lucide="log-out"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1 class="content-title">Kelola Pesanan</h1>
+                <p class="content-subtitle">Pantau pesanan customer, status pembayaran, dan ringkasan produk yang dibeli.</p>
+            </div>
+        </header>
+
+        <div class="state-message" id="order-state"></div>
+
+        <section class="table-card">
+            <div class="table-toolbar">
+                <div>
+                    <h2>Daftar Pesanan</h2>
+                    <span id="order-count">0 pesanan</span>
+                </div>
+            </div>
+            <div class="order-controls">
+                <div class="control-group">
+                    <label for="search-order">Cari Pesanan</label>
+                    <input type="search" id="search-order" class="control-field" placeholder="Cari pesanan...">
+                </div>
+                <div class="control-group">
+                    <label for="filter-status">Status Pesanan</label>
+                    <select id="filter-status" class="control-field">
+                        <option value="all">Semua Status</option>
+                        <option value="menunggu">Menunggu</option>
+                        <option value="diproses">Diproses</option>
+                        <option value="dikirim">Dikirim</option>
+                        <option value="selesai">Selesai</option>
+                        <option value="dibatalkan">Dibatalkan</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="sort-order">Urutkan</label>
+                    <select id="sort-order" class="control-field">
+                        <option value="newest">Terbaru</option>
+                        <option value="oldest">Terlama</option>
+                        <option value="total-desc">Total Tertinggi</option>
+                        <option value="total-asc">Total Terendah</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-reset" id="reset-filter">
+                    <i data-lucide="rotate-ccw"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Pesanan</th>
+                            <th>Customer</th>
+                            <th>Tanggal</th>
+                            <th>Total Pembayaran</th>
+                            <th>Metode Pembayaran</th>
+                            <th>Status Pembayaran</th>
+                            <th>Status Pesanan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="order-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Detail Pesanan</h3>
+                <button class="btn-close-modal" type="button" id="modal-close" aria-label="Tutup detail pesanan">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:3000/api";
+
+        const orderState = document.getElementById("order-state");
+        const orderTableBody = document.getElementById("order-table-body");
+        const orderCount = document.getElementById("order-count");
+        const searchOrderInput = document.getElementById("search-order");
+        const filterStatusSelect = document.getElementById("filter-status");
+        const sortOrderSelect = document.getElementById("sort-order");
+        const resetFilterButton = document.getElementById("reset-filter");
+        const orderModal = document.getElementById("order-modal");
+        const modalTitle = document.getElementById("modal-title");
+        const modalContent = document.getElementById("modal-content");
+
+        let allOrders = [];
+        let filteredOrders = [];
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0
+            }).format(Number(number) || 0);
+        }
+
+        function parseDateValue(dateValue) {
+            if (!dateValue) return new Date("");
+            const monthMap = {
+                januari: "January",
+                februari: "February",
+                maret: "March",
+                april: "April",
+                mei: "May",
+                juni: "June",
+                juli: "July",
+                agustus: "August",
+                september: "September",
+                oktober: "October",
+                november: "November",
+                desember: "December"
+            };
+            let normalizedDate = String(dateValue).toLowerCase();
+
+            Object.keys(monthMap).forEach((month) => {
+                normalizedDate = normalizedDate.replace(month, monthMap[month]);
+            });
+
+            return new Date(normalizedDate);
+        }
+
+        function formatTanggal(dateValue) {
+            if (!dateValue) return "-";
+            const date = parseDateValue(dateValue);
+            if (Number.isNaN(date.getTime())) return dateValue;
+            return date.toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function getOrderId(order) {
+            return order.id || order.order_id || "-";
+        }
+
+        function getNumericOrderId(order) {
+            if (order.order_id) return order.order_id;
+            const match = String(order.id || "").match(/\d+/);
+            return match ? match[0] : "";
+        }
+
+        function getCustomerName(order) {
+            return order.customer || order.username || order.nama_customer || order.name || "-";
+        }
+
+        function getOrderDate(order) {
+            return order.rawDate || order.tanggal_order || order.date || order.created_at || "";
+        }
+
+        function getOrderTotal(order) {
+            return Number(order.total || order.total_harga || order.total_pembayaran || 0);
+        }
+
+        function getOrderStatus(order) {
+            return order.status_order || order.status || "-";
+        }
+
+        function getPaymentMethod(order) {
+            return order.metode_pembayaran || order.paymentMethod || order.metodePembayaran || "-";
+        }
+
+        function getPaymentStatus(order) {
+            return order.status_pembayaran || order.paymentStatus || "-";
+        }
+
+        function getStatusClass(status) {
+            const value = String(status || "").toLowerCase();
+            if (value.includes("lunas") || value.includes("sudah")) return "status-lunas";
+            if (value.includes("belum")) return "status-belum-dibayar";
+            if (value.includes("refund")) return "status-refund";
+            if (value.includes("gagal")) return "status-gagal";
+            if (value.includes("selesai")) return "status-selesai";
+            if (value.includes("kirim")) return "status-dikirim";
+            if (value.includes("batal")) return "status-dibatalkan";
+            if (value.includes("menunggu")) return "status-menunggu";
+            if (value.includes("proses")) return "status-diproses";
+            return "status-netral";
+        }
+
+        function getStatusBadge(status) {
+            const label = status || "-";
+            return `<span class="status-badge ${getStatusClass(label)}">${escapeHTML(label)}</span>`;
+        }
+
+        function renderLoading() {
+            orderState.className = "state-message show";
+            orderState.innerHTML = '<div class="loading-spinner"></div><span>Memuat data pesanan...</span>';
+            lucide.createIcons();
+        }
+
+        function renderError() {
+            orderState.className = "state-message show error";
+            orderState.innerHTML = '<i data-lucide="alert-circle"></i><span>Gagal memuat data pesanan. Pastikan server backend berjalan.</span>';
+            lucide.createIcons();
+        }
+
+        function hideState() {
+            orderState.className = "state-message";
+            orderState.innerHTML = "";
+        }
+
+        function renderEmptyState(message) {
+            orderTableBody.innerHTML = `<tr><td colspan="8" class="empty-row">${escapeHTML(message)}</td></tr>`;
+        }
+
+        async function fetchPaymentInfo(order) {
+            const orderId = getNumericOrderId(order);
+            if (!orderId) return order;
+
+            try {
+                const response = await fetch(`${API_BASE}/payments/order/${orderId}`);
+                const data = await response.json();
+                const payment = data.payment && data.payment[0];
+
+                if (response.ok && data.success && payment) {
+                    return {
+                        ...order,
+                        metode_pembayaran: payment.metode_pembayaran,
+                        status_pembayaran: payment.status_pembayaran,
+                        tanggal_bayar: payment.tanggal_bayar
+                    };
+                }
+            } catch (error) {
+                return order;
+            }
+
+            return order;
+        }
+
+        async function fetchOrders() {
+            renderLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/orders/all`);
+                const data = await response.json();
+
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.message || "Gagal memuat pesanan.");
+                }
+
+                const orders = Array.isArray(data.orders) ? data.orders : [];
+                allOrders = await Promise.all(orders.map(fetchPaymentInfo));
+                applyOrderFilters();
+                hideState();
+            } catch (error) {
+                allOrders = [];
+                filteredOrders = [];
+                renderOrders(filteredOrders);
+                renderError();
+            }
+        }
+
+        function applyOrderFilters() {
+            const keyword = searchOrderInput.value.trim().toLowerCase();
+            const selectedStatus = filterStatusSelect.value;
+            const sortBy = sortOrderSelect.value;
+
+            filteredOrders = allOrders.filter((order) => {
+                const searchable = [
+                    getOrderId(order),
+                    getCustomerName(order),
+                    getOrderStatus(order),
+                    getPaymentMethod(order)
+                ].join(" ").toLowerCase();
+                const orderStatus = String(getOrderStatus(order)).toLowerCase();
+                const matchKeyword = !keyword || searchable.includes(keyword);
+                const matchStatus = selectedStatus === "all" || orderStatus.includes(selectedStatus);
+
+                return matchKeyword && matchStatus;
+            });
+
+            filteredOrders.sort((a, b) => {
+                if (sortBy === "total-desc") return getOrderTotal(b) - getOrderTotal(a);
+                if (sortBy === "total-asc") return getOrderTotal(a) - getOrderTotal(b);
+
+                const dateA = parseDateValue(getOrderDate(a)).getTime() || 0;
+                const dateB = parseDateValue(getOrderDate(b)).getTime() || 0;
+                return sortBy === "oldest" ? dateA - dateB : dateB - dateA;
+            });
+
+            renderOrders(filteredOrders);
+        }
+
+        function resetOrderFilters() {
+            searchOrderInput.value = "";
+            filterStatusSelect.value = "all";
+            sortOrderSelect.value = "newest";
+            applyOrderFilters();
+        }
+
+        function renderOrders(orders) {
+            orderCount.textContent = `Menampilkan ${orders.length} dari ${allOrders.length} pesanan`;
+            orderTableBody.innerHTML = "";
+
+            if (!orders.length) {
+                renderEmptyState(allOrders.length ? "Pesanan tidak ditemukan." : "Belum ada pesanan.");
+                return;
+            }
+
+            orders.forEach((order, index) => {
+                const itemsSummary = order.itemsSummary || order.items_summary || "Detail produk belum tersedia.";
+
+                orderTableBody.insertAdjacentHTML("beforeend", `
+                    <tr>
+                        <td><span class="order-id">${escapeHTML(getOrderId(order))}</span></td>
+                        <td>
+                            <strong>${escapeHTML(getCustomerName(order))}</strong>
+                            <div class="muted-text">${escapeHTML(itemsSummary)}</div>
+                        </td>
+                        <td>${escapeHTML(formatTanggal(getOrderDate(order)))}</td>
+                        <td><span class="total-price">${formatRupiah(getOrderTotal(order))}</span></td>
+                        <td>${escapeHTML(getPaymentMethod(order))}</td>
+                        <td>${getStatusBadge(getPaymentStatus(order))}</td>
+                        <td>${getStatusBadge(getOrderStatus(order))}</td>
+                        <td>
+                            <button class="btn detail-btn" type="button" onclick="openOrderDetail(${index})">
+                                <i data-lucide="eye"></i>
+                                <span>Lihat Detail</span>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            lucide.createIcons();
+        }
+
+        function getOrderItems(order) {
+            if (Array.isArray(order.items) && order.items.length) {
+                return order.items;
+            }
+
+            const summary = order.itemsSummary || order.items_summary || "";
+            if (!summary) return [];
+
+            return summary.split(",").map((itemText) => {
+                const match = itemText.trim().match(/(.+)\s+\(x(\d+)\)/i);
+                return {
+                    name: match ? match[1].trim() : itemText.trim(),
+                    qty: match ? Number(match[2]) : 1,
+                    price: 0,
+                    subtotal: 0,
+                    image: ""
+                };
+            });
+        }
+
+        function getImagePath(imagePath) {
+            if (!imagePath) return "";
+            if (imagePath.startsWith("http") || imagePath.startsWith("/") || imagePath.startsWith("../") || imagePath.startsWith("./")) {
+                return imagePath;
+            }
+            return "../" + imagePath;
+        }
+
+        function renderOrderItems(order) {
+            const items = getOrderItems(order);
+
+            if (!items.length) {
+                return '<div class="muted-text">Detail produk belum tersedia dari API.</div>';
+            }
+
+            return items.map((item) => {
+                const qty = Number(item.qty || item.jumlah || 1);
+                const unitPrice = Number(item.unitPrice || item.harga_satuan || item.price || 0);
+                const subtotal = Number(item.subtotal || item.total || unitPrice * qty || 0);
+                const image = getImagePath(item.image || item.gambar || "");
+                const imageContent = image
+                    ? `<img src="${escapeHTML(image)}" alt="${escapeHTML(item.name || item.nama_barang || "Produk")}" class="item-thumb" onerror="this.replaceWith(document.createTextNode('-'))">`
+                    : '<div class="item-thumb"></div>';
+
+                return `
+                    <div class="item-row">
+                        ${imageContent}
+                        <div>
+                            <div class="item-name">${escapeHTML(item.name || item.nama_barang || "Produk")}</div>
+                            <div class="item-meta">
+                                ${unitPrice > 0 ? `${formatRupiah(unitPrice)} x ${qty}` : `Jumlah: ${qty}`}
+                            </div>
+                        </div>
+                        <div class="item-subtotal">${subtotal > 0 ? `Subtotal: ${formatRupiah(subtotal)}` : "Subtotal belum tersedia"}</div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function openOrderDetail(index) {
+            const order = filteredOrders[index];
+            if (!order) return;
+
+            modalTitle.textContent = `Detail ${getOrderId(order)}`;
+            modalContent.innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-line"><span>ID Pesanan</span><strong>${escapeHTML(getOrderId(order))}</strong></div>
+                    <div class="detail-line"><span>Nama Customer</span><strong>${escapeHTML(getCustomerName(order))}</strong></div>
+                    <div class="detail-line"><span>Email Customer</span><strong>${escapeHTML(order.email || order.email_customer || "-")}</strong></div>
+                    <div class="detail-line"><span>Tanggal Pesanan</span><strong>${escapeHTML(formatTanggal(getOrderDate(order)))}</strong></div>
+                    <div class="detail-line"><span>Alamat Pengiriman</span><strong>${escapeHTML(order.alamat || order.alamat_pengiriman || "-")}</strong></div>
+                    <div class="detail-line"><span>Metode Pembayaran</span><strong>${escapeHTML(getPaymentMethod(order))}</strong></div>
+                    <div class="detail-line"><span>Status Pembayaran</span><strong>${getStatusBadge(getPaymentStatus(order))}</strong></div>
+                    <div class="detail-line"><span>Status Pesanan</span><strong>${getStatusBadge(getOrderStatus(order))}</strong></div>
+                    <div class="detail-line"><span>Total Pembayaran</span><strong>${formatRupiah(getOrderTotal(order))}</strong></div>
+                </div>
+                <h4 class="detail-section-title">Produk Dibeli</h4>
+                <div class="item-list">${renderOrderItems(order)}</div>
+            `;
+            orderModal.classList.add("show");
+            lucide.createIcons();
+        }
+
+        function closeOrderDetail() {
+            orderModal.classList.remove("show");
+        }
+
+        window.openOrderDetail = openOrderDetail;
+
+        document.getElementById("modal-close").addEventListener("click", closeOrderDetail);
+        orderModal.addEventListener("click", function (event) {
+            if (event.target === orderModal) closeOrderDetail();
+        });
+
+        searchOrderInput.addEventListener("input", applyOrderFilters);
+        filterStatusSelect.addEventListener("change", applyOrderFilters);
+        sortOrderSelect.addEventListener("change", applyOrderFilters);
+        resetFilterButton.addEventListener("click", resetOrderFilters);
+
+        document.getElementById("logout-btn").addEventListener("click", function () {
+            localStorage.removeItem("currentUser");
+            localStorage.removeItem("user");
+            window.location.href = "../login.html";
+        });
+
+        lucide.createIcons();
+        fetchOrders();
+    </script>
+</body>
+</html>

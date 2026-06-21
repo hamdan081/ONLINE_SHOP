@@ -36,12 +36,18 @@ const fileFilter = function (req, file, cb) {
 const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
-    limits: { fileSize: 2 * 1024 * 1024 } // 2MB max
+    limits: {
+        fileSize: 2 * 1024 * 1024, // 2MB max
+        files: 5 // Max 5 files
+    }
 });
 
 // Middleware to handle multer errors gracefully
 function handleUpload(req, res, next) {
-    upload.single('image')(req, res, function (err) {
+    upload.fields([
+        { name: 'image', maxCount: 1 },
+        { name: 'images', maxCount: 5 }
+    ])(req, res, function (err) {
         if (err instanceof multer.MulterError) {
             if (err.code === 'LIMIT_FILE_SIZE') {
                 return res.status(400).json({
@@ -59,6 +65,10 @@ function handleUpload(req, res, next) {
                 message: err.message
             });
         }
+
+        const singleImage = req.files && req.files.image ? req.files.image : [];
+        const multipleImages = req.files && req.files.images ? req.files.images : [];
+        req.files = [...singleImage, ...multipleImages];
         next();
     });
 }

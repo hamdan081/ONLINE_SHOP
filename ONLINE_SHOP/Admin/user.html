@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola User - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../Assect/Css/style.css">
+    <link rel="stylesheet" href="../Assect/Css/toast.css">
+    <script src="../Assect/Js/toast.js"></script>
+    <style>
+        :root {
+            --admin-blue: #1F3C88;
+            --admin-green: #27AE60;
+            --surface: #F6F8FB;
+            --card: #FFFFFF;
+            --text: #1E293B;
+            --muted: #64748B;
+            --line: #E2E8F0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", Arial, sans-serif;
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .admin-body {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--admin-blue);
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .sidebar-header svg {
+            color: #4ADE80;
+        }
+
+        .sidebar-brand {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .sidebar-menu {
+            padding: 18px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 24px;
+            color: rgba(255, 255, 255, 0.72);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-left: 4px solid transparent;
+            transition: 0.2s ease;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.11);
+        }
+
+        .menu-item.active {
+            border-left-color: #4ADE80;
+        }
+
+        .sidebar-footer {
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            display: grid;
+            gap: 10px;
+        }
+
+        .btn-exit-admin,
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.72);
+            text-decoration: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-exit-admin:hover {
+            color: #FFFFFF;
+        }
+
+        .btn-logout:hover {
+            color: #FCA5A5;
+        }
+
+        .main-content {
+            width: 100%;
+            padding: 34px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            overflow-x: hidden;
+        }
+
+        .content-title {
+            margin: 0;
+            font-size: 1.9rem;
+            font-weight: 800;
+        }
+
+        .content-subtitle {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .state-message {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            border: 1px solid var(--line);
+            background: #FFFFFF;
+            color: var(--muted);
+        }
+
+        .state-message.show {
+            display: flex;
+        }
+
+        .state-message.error {
+            color: #991B1B;
+            background: #FEF2F2;
+            border-color: #FECACA;
+        }
+
+        .table-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 16px 35px rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+        }
+
+        .table-toolbar {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            align-items: center;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .table-toolbar h2 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+        .table-toolbar span {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .user-controls {
+            padding: 18px 20px;
+            display: grid;
+            grid-template-columns: minmax(220px, 1.3fr) minmax(170px, 0.8fr) minmax(170px, 0.8fr) auto;
+            gap: 12px;
+            align-items: end;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .control-group label {
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .control-field {
+            width: 100%;
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font: inherit;
+            font-weight: 600;
+            color: var(--text);
+            background: #FFFFFF;
+            outline: none;
+        }
+
+        .control-field:focus {
+            border-color: var(--admin-blue);
+            box-shadow: 0 0 0 3px rgba(31, 60, 136, 0.12);
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-reset {
+            min-height: 42px;
+            padding: 10px 16px;
+            background: #F1F5F9;
+            color: #475569;
+            border: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        .btn-reset:hover {
+            background: #E2E8F0;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1040px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 14px 18px;
+            background: #F8FAFC;
+            color: var(--muted);
+            font-size: 0.78rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+            font-size: 0.94rem;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        tbody tr:hover td {
+            background: #FAFCFF;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-initials {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #EFF6FF;
+            color: #1D4ED8;
+            border: 1px solid #BFDBFE;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .user-name {
+            font-weight: 800;
+        }
+
+        .muted-text {
+            color: var(--muted);
+            font-size: 0.84rem;
+            line-height: 1.5;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .role-admin,
+        .role-administrator { background: #FEF3C7; color: #92400E; }
+        .role-user,
+        .role-customer,
+        .role-pelanggan { background: #DCFCE7; color: #15803D; }
+        .role-netral { background: #F1F5F9; color: #475569; }
+
+        .detail-btn {
+            padding: 9px 12px;
+            background: var(--admin-blue);
+            color: #FFFFFF;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .detail-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(31, 60, 136, 0.16);
+        }
+
+        .empty-row {
+            padding: 42px 18px;
+            color: var(--muted);
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            padding: 18px;
+            background: rgba(15, 23, 42, 0.46);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            width: min(760px, 100%);
+            max-height: 92vh;
+            overflow-y: auto;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #FFFFFF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 20px 22px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .btn-close-modal {
+            width: 36px;
+            height: 36px;
+            border: 0;
+            border-radius: 8px;
+            background: #F1F5F9;
+            color: var(--muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 22px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .profile-summary {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            border-radius: 12px;
+            background: #F8FAFC;
+            border: 1px solid var(--line);
+        }
+
+        .profile-summary .user-initials {
+            width: 56px;
+            height: 56px;
+            font-size: 1.05rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .detail-line {
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #FFFFFF;
+            display: grid;
+            gap: 6px;
+        }
+
+        .detail-line span {
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .detail-line strong {
+            line-height: 1.5;
+        }
+
+        @media (max-width: 860px) {
+            .admin-body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .sidebar-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 10px 12px;
+            }
+
+            .menu-item {
+                border-left: 0;
+                border-bottom: 3px solid transparent;
+                padding: 12px 14px;
+                white-space: nowrap;
+            }
+
+            .menu-item.active {
+                border-bottom-color: #4ADE80;
+            }
+
+            .main-content {
+                padding: 22px 16px;
+            }
+
+            .table-toolbar,
+            .profile-summary {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .user-controls,
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-reset {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i data-lucide="shield"></i>
+            <span class="sidebar-brand">Admin Panel</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="product.html" class="menu-item">
+                <i data-lucide="package"></i>
+                <span>Produk</span>
+            </a>
+            <a href="order.html" class="menu-item">
+                <i data-lucide="shopping-cart"></i>
+                <span>Pesanan</span>
+            </a>
+            <a href="user.html" class="menu-item active">
+                <i data-lucide="users"></i>
+                <span>User</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="../home.html" class="btn-exit-admin">
+                <i data-lucide="home"></i>
+                <span>Ke Marketplace</span>
+            </a>
+            <button type="button" class="btn-logout" id="logout-btn">
+                <i data-lucide="log-out"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1 class="content-title">Kelola User</h1>
+            <p class="content-subtitle">Lihat daftar user, cari akun tertentu, dan buka detail profil user dari data backend.</p>
+        </header>
+
+        <div class="state-message" id="user-state"></div>
+
+        <section class="table-card">
+            <div class="table-toolbar">
+                <div>
+                    <h2>Daftar User</h2>
+                    <span id="user-count">0 user</span>
+                </div>
+            </div>
+            <div class="user-controls">
+                <div class="control-group">
+                    <label for="search-user">Cari User</label>
+                    <input type="search" id="search-user" class="control-field" placeholder="Cari user...">
+                </div>
+                <div class="control-group">
+                    <label for="filter-role">Filter Role</label>
+                    <select id="filter-role" class="control-field">
+                        <option value="all">Semua Role</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="sort-user">Urutkan</label>
+                    <select id="sort-user" class="control-field">
+                        <option value="default">Default</option>
+                        <option value="name-asc">Nama A-Z</option>
+                        <option value="name-desc">Nama Z-A</option>
+                        <option value="email-asc">Email A-Z</option>
+                        <option value="email-desc">Email Z-A</option>
+                        <option value="newest">User Terbaru</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-reset" id="reset-filter">
+                    <i data-lucide="rotate-ccw"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID User</th>
+                            <th>Nama User</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Alamat</th>
+                            <th>Kampus</th>
+                            <th>Nomor HP</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="user-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Detail User</h3>
+                <button class="btn-close-modal" id="modal-close" type="button" aria-label="Tutup detail user">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:3000/api";
+
+        const userState = document.getElementById("user-state");
+        const userTableBody = document.getElementById("user-table-body");
+        const userCount = document.getElementById("user-count");
+        const searchUserInput = document.getElementById("search-user");
+        const filterRoleSelect = document.getElementById("filter-role");
+        const sortUserSelect = document.getElementById("sort-user");
+        const resetFilterButton = document.getElementById("reset-filter");
+        const userModal = document.getElementById("user-modal");
+        const modalTitle = document.getElementById("modal-title");
+        const modalContent = document.getElementById("modal-content");
+
+        let allUsers = [];
+        let filteredUsers = [];
+
+        function escapeHTML(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function valueOrEmpty(value) {
+            const text = String(value ?? "").trim();
+            return text || "Belum diisi";
+        }
+
+        function getUserId(user) {
+            return user.user_id || user.id || "-";
+        }
+
+        function getUserName(user) {
+            return user.username || user.name || "Belum diisi";
+        }
+
+        function getUserRole(user) {
+            const rawRole = user.role || user.user_role || user.tipe_user || "";
+            if (rawRole) return String(rawRole);
+
+            const name = String(user.username || "").toLowerCase();
+            const email = String(user.email || "").toLowerCase();
+            if (name === "admin" || name.includes("admin") || email.includes("admin")) return "Admin";
+            return "User";
+        }
+
+        function getInitials(name) {
+            return String(name || "U")
+                .split(" ")
+                .filter(Boolean)
+                .map((part) => part[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase() || "U";
+        }
+
+        function getRoleBadge(role) {
+            const label = valueOrEmpty(role);
+            const roleClass = label.toLowerCase().replace(/\s+/g, "-");
+            const safeClass = ["admin", "administrator", "user", "customer", "pelanggan"].includes(roleClass) ? `role-${roleClass}` : "role-netral";
+            return `<span class="role-badge ${safeClass}">${escapeHTML(label)}</span>`;
+        }
+
+        function getDateValue(user) {
+            return user.created_at || user.createdAt || user.tanggal_daftar || user.registered_at || "";
+        }
+
+        function renderLoading() {
+            userState.className = "state-message show";
+            userState.innerHTML = '<div class="loading-spinner"></div><span>Memuat data user...</span>';
+            lucide.createIcons();
+        }
+
+        function renderError() {
+            userState.className = "state-message show error";
+            userState.innerHTML = '<i data-lucide="alert-circle"></i><span>Gagal memuat data user. Pastikan server backend sudah berjalan.</span>';
+            lucide.createIcons();
+        }
+
+        function hideState() {
+            userState.className = "state-message";
+            userState.innerHTML = "";
+        }
+
+        function renderEmptyState(message) {
+            userTableBody.innerHTML = `<tr><td colspan="8" class="empty-row">${escapeHTML(message)}</td></tr>`;
+        }
+
+        async function fetchUserProfile(user) {
+            const userId = getUserId(user);
+            if (!userId || userId === "-") return user;
+
+            try {
+                const response = await fetch(`${API_BASE}/users/profile/${userId}`);
+                const data = await response.json();
+
+                if (response.ok && data.success && data.user) {
+                    return { ...user, ...data.user, user_id: userId };
+                }
+            } catch (error) {
+                return user;
+            }
+
+            return user;
+        }
+
+        async function fetchUsers() {
+            renderLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/users/all`);
+                const data = await response.json();
+
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.message || "Gagal memuat data user.");
+                }
+
+                const users = Array.isArray(data.users) ? data.users : [];
+                allUsers = await Promise.all(users.map(fetchUserProfile));
+                populateRoleFilter(allUsers);
+                applyUserFilters();
+                hideState();
+            } catch (error) {
+                allUsers = [];
+                filteredUsers = [];
+                populateRoleFilter(allUsers);
+                renderUsers(filteredUsers);
+                renderError();
+            }
+        }
+
+        function populateRoleFilter(users) {
+            const selectedRole = filterRoleSelect.value;
+            const roles = [...new Set(users.map(getUserRole).filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, "id-ID"));
+
+            filterRoleSelect.innerHTML = '<option value="all">Semua Role</option>';
+            roles.forEach((role) => {
+                filterRoleSelect.insertAdjacentHTML("beforeend", `<option value="${escapeHTML(role)}">${escapeHTML(role)}</option>`);
+            });
+
+            if (selectedRole && roles.includes(selectedRole)) {
+                filterRoleSelect.value = selectedRole;
+            }
+        }
+
+        function applyUserFilters() {
+            const keyword = searchUserInput.value.trim().toLowerCase();
+            const selectedRole = filterRoleSelect.value;
+            const sortBy = sortUserSelect.value;
+
+            filteredUsers = allUsers.filter((user) => {
+                const searchable = [
+                    getUserName(user),
+                    user.email,
+                    getUserRole(user),
+                    user.alamat,
+                    user.kampus
+                ].join(" ").toLowerCase();
+                const matchKeyword = !keyword || searchable.includes(keyword);
+                const matchRole = selectedRole === "all" || getUserRole(user) === selectedRole;
+
+                return matchKeyword && matchRole;
+            });
+
+            filteredUsers.sort((a, b) => {
+                const nameA = getUserName(a);
+                const nameB = getUserName(b);
+                const emailA = String(a.email || "");
+                const emailB = String(b.email || "");
+
+                if (sortBy === "name-asc") return nameA.localeCompare(nameB, "id-ID");
+                if (sortBy === "name-desc") return nameB.localeCompare(nameA, "id-ID");
+                if (sortBy === "email-asc") return emailA.localeCompare(emailB, "id-ID");
+                if (sortBy === "email-desc") return emailB.localeCompare(emailA, "id-ID");
+                if (sortBy === "newest") {
+                    const dateA = new Date(getDateValue(a)).getTime() || 0;
+                    const dateB = new Date(getDateValue(b)).getTime() || 0;
+                    return dateB - dateA;
+                }
+
+                return 0;
+            });
+
+            renderUsers(filteredUsers);
+        }
+
+        function resetUserFilters() {
+            searchUserInput.value = "";
+            filterRoleSelect.value = "all";
+            sortUserSelect.value = "default";
+            applyUserFilters();
+        }
+
+        function renderUsers(users) {
+            userCount.textContent = `Menampilkan ${users.length} dari ${allUsers.length} user`;
+            userTableBody.innerHTML = "";
+
+            if (!users.length) {
+                renderEmptyState(allUsers.length ? "User tidak ditemukan." : "Belum ada user.");
+                return;
+            }
+
+            users.forEach((user, index) => {
+                const name = getUserName(user);
+
+                userTableBody.insertAdjacentHTML("beforeend", `
+                    <tr>
+                        <td><strong>#${escapeHTML(getUserId(user))}</strong></td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-initials">${escapeHTML(getInitials(name))}</div>
+                                <div>
+                                    <div class="user-name">${escapeHTML(name)}</div>
+                                    <div class="muted-text">${escapeHTML(valueOrEmpty(user.email))}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${escapeHTML(valueOrEmpty(user.email))}</td>
+                        <td>${getRoleBadge(getUserRole(user))}</td>
+                        <td>${escapeHTML(valueOrEmpty(user.alamat))}</td>
+                        <td>${escapeHTML(valueOrEmpty(user.kampus))}</td>
+                        <td>${escapeHTML(valueOrEmpty(user.no_hp || user.phone))}</td>
+                        <td>
+                            <button class="btn detail-btn" type="button" onclick="openUserDetail(${index})">
+                                <i data-lucide="eye"></i>
+                                <span>Lihat Detail</span>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            lucide.createIcons();
+        }
+
+        function openUserDetail(index) {
+            const user = filteredUsers[index];
+            if (!user) return;
+
+            const name = getUserName(user);
+            modalTitle.textContent = `Detail ${name}`;
+            modalContent.innerHTML = `
+                <div class="profile-summary">
+                    <div class="user-initials">${escapeHTML(getInitials(name))}</div>
+                    <div>
+                        <div class="user-name">${escapeHTML(name)}</div>
+                        <div class="muted-text">${escapeHTML(valueOrEmpty(user.email))}</div>
+                        <div style="margin-top: 8px;">${getRoleBadge(getUserRole(user))}</div>
+                    </div>
+                </div>
+                <div class="detail-grid">
+                    <div class="detail-line"><span>ID User</span><strong>${escapeHTML(getUserId(user))}</strong></div>
+                    <div class="detail-line"><span>Nama User</span><strong>${escapeHTML(name)}</strong></div>
+                    <div class="detail-line"><span>Email</span><strong>${escapeHTML(valueOrEmpty(user.email))}</strong></div>
+                    <div class="detail-line"><span>Role</span><strong>${getRoleBadge(getUserRole(user))}</strong></div>
+                    <div class="detail-line"><span>Alamat</span><strong>${escapeHTML(valueOrEmpty(user.alamat))}</strong></div>
+                    <div class="detail-line"><span>Kampus</span><strong>${escapeHTML(valueOrEmpty(user.kampus))}</strong></div>
+                    <div class="detail-line"><span>Nomor HP</span><strong>${escapeHTML(valueOrEmpty(user.no_hp || user.phone))}</strong></div>
+                    <div class="detail-line"><span>Jumlah Transaksi</span><strong>${escapeHTML(valueOrEmpty(user.total_transaksi || user.transaction_count))}</strong></div>
+                    <div class="detail-line"><span>Tanggal Daftar</span><strong>${escapeHTML(valueOrEmpty(getDateValue(user)))}</strong></div>
+                </div>
+            `;
+            userModal.classList.add("show");
+            lucide.createIcons();
+        }
+
+        function closeUserDetail() {
+            userModal.classList.remove("show");
+        }
+
+        window.openUserDetail = openUserDetail;
+
+        document.getElementById("modal-close").addEventListener("click", closeUserDetail);
+        userModal.addEventListener("click", function (event) {
+            if (event.target === userModal) closeUserDetail();
+        });
+
+        searchUserInput.addEventListener("input", applyUserFilters);
+        filterRoleSelect.addEventListener("change", applyUserFilters);
+        sortUserSelect.addEventListener("change", applyUserFilters);
+        resetFilterButton.addEventListener("click", resetUserFilters);
+
+        document.getElementById("logout-btn").addEventListener("click", function () {
+            localStorage.removeItem("currentUser");
+            localStorage.removeItem("user");
+            window.location.href = "../login.html";
+        });
+
+        lucide.createIcons();
+        fetchUsers();
+    </script>
+</body>
+</html>

@@ -61,10 +61,12 @@ const createProduct = async (req, res) => {
         // Fallback user ID to 1 (taufik) if not provided
         const userIdVal = user_id || 1;
 
-        // Priority: uploaded file > body image field > default
+        // Priority: uploaded files > body image field > default
         let imgVal = 'Assect/Img/headphone.png';
-        if (req.file) {
-            imgVal = '/uploads/products/' + req.file.filename;
+        if (req.files && req.files.length > 0) {
+            // Use first image as primary, store all paths as JSON
+            const imagePaths = req.files.map(file => '/uploads/products/' + file.filename);
+            imgVal = JSON.stringify(imagePaths);
         } else if (image) {
             imgVal = image;
         }
@@ -100,10 +102,12 @@ const updateProduct = async (req, res) => {
 
         const current = check.rows[0];
 
-        // Priority: uploaded file > body image field > existing image in DB
+        // Priority: uploaded files > body image field > existing image in DB
         let imgVal = current.image;
-        if (req.file) {
-            imgVal = '/uploads/products/' + req.file.filename;
+        if (req.files && req.files.length > 0) {
+            // Store all file paths as JSON
+            const imagePaths = req.files.map(file => '/uploads/products/' + file.filename);
+            imgVal = JSON.stringify(imagePaths);
         } else if (image) {
             imgVal = image;
         }

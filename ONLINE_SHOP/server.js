@@ -47,9 +47,14 @@ async function seedDatabase() {
             console.log('[+] Database Seed: User default taufik berhasil ditambahkan.');
         }
 
-        // 2. Check if products are empty
-        const checkProducts = await db.query('SELECT COUNT(*) FROM produk');
-        const count = parseInt(checkProducts.rows[0].count);
+        // Set SEED_DEFAULT_PRODUCTS=true to create demo products.
+        // Otherwise, remove legacy demo products while preserving user-created data.
+        const seedDefaultProducts = process.env.SEED_DEFAULT_PRODUCTS === 'true';
+
+        if (seedDefaultProducts) {
+            // 2. Check if products are empty
+            const checkProducts = await db.query('SELECT COUNT(*) FROM produk');
+            const count = parseInt(checkProducts.rows[0].count);
 
         if (count === 0) {
             console.log('[*] Database Seed: Tabel produk kosong. Memulai seeding...');
@@ -110,6 +115,23 @@ async function seedDatabase() {
             console.log('[+] Database Seed: 6 Produk berhasil dimasukkan ke tabel produk.');
         } else {
             console.log(`[+] Database Seed: Tabel produk terisi dengan ${count} produk.`);
+        }
+        } else {
+            // 2. Clean up default seeded products from the database (run once to clear existing default seeds)
+            const deleteResult = await db.query(`
+            DELETE FROM produk
+            WHERE image IN (
+                'Assect/Img/headphone.png',
+                'Assect/Img/speaker.png',
+                'Assect/Img/smartwatch.png',
+                'Assect/Img/camera.png',
+                'Assect/Img/sneakers.png',
+                'Assect/Img/backpack.png'
+            )
+            `);
+            if (deleteResult.rowCount > 0) {
+                console.log(`[+] Database Cleanup: Berhasil menghapus ${deleteResult.rowCount} produk bawaan.`);
+            }
         }
     } catch (err) {
         console.error('[-] Error saat database seeding:', err.message);
