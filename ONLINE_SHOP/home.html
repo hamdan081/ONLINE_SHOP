@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace Home</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="Assect/Css/style.css">
+    <link rel="stylesheet" href="Assect/Css/toast.css">
+    <script src="Assect/Js/toast.js"></script>
+</head>
+
+<body class="home-body">
+    <header class="site-header">
+        <a href="home.html" class="brand">Marketplace</a>
+        <div class="header-actions">
+            <a href="Page/cart.html" class="icon-btn" aria-label="Keranjang">
+                <i data-lucide="shopping-cart"></i>
+            </a>
+            <a href="Page/profile.html" class="icon-btn" aria-label="Profil">
+                <i data-lucide="user"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="home-page">
+        <section class="hero-bar animate-up">
+            <div>
+                <p class="eyebrow">Marketplace</p>
+                <h2>Temukan Produk Favoritmu</h2>
+            </div>
+        </section>
+
+        <section class="product-toolbar" aria-label="Pencarian dan pengurutan produk">
+            <div class="search-box">
+                <i data-lucide="search"></i>
+                <input type="search" id="searchInput" placeholder="Cari produk..." autocomplete="off">
+            </div>
+
+            <label class="toolbar-field">
+                <span>Kategori</span>
+                <select id="categoryFilter">
+                    <option value="all">Semua</option>
+                </select>
+            </label>
+
+            <label class="toolbar-field">
+                <span>Urutkan</span>
+                <select id="sortSelect">
+                    <option value="default">Default</option>
+                    <option value="price-asc">Harga Termurah</option>
+                    <option value="price-desc">Harga Termahal</option>
+                    <option value="name-asc">Nama A-Z</option>
+                    <option value="name-desc">Nama Z-A</option>
+                </select>
+            </label>
+        </section>
+
+        <div id="productStatus" class="product-status loading">
+            <div class="loading-spinner"></div>
+            <span>Memuat produk...</span>
+        </div>
+        <section class="products-grid" id="productsGrid">
+        </section>
+    </main>
+
+    <script>
+        // Initialize Lucide Icons jika CDN berhasil dimuat.
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        const API_BASE = 'http://localhost:3000/api';
+        const BASE_URL = 'http://localhost:3000';
+        let allProducts = [];
+
+        const productsGrid = document.getElementById('productsGrid');
+        const productStatus = document.getElementById('productStatus');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const sortSelect = document.getElementById('sortSelect');
+        let lastEmptyToastKey = '';
+
+        // Helper: resolve any image value to a displayable URL
+        function getImageUrl(image) {
+            if (!image) return 'Assect/Img/backpack.png';
+            if (image.startsWith('http')) return image;
+            if (image.startsWith('/uploads')) return BASE_URL + image;
+            return image;
+        }
+
+        // Helper to format currency
+        function formatRupiah(number) {
+            return "Rp " + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function escapeHTML(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function showProductStatus(message, type = '') {
+            productStatus.innerHTML = type === 'loading'
+                ? `<div class="loading-spinner"></div><span>${escapeHTML(message)}</span>`
+                : escapeHTML(message);
+            productStatus.className = `product-status ${type}`;
+            productStatus.style.display = 'block';
+        }
+
+        function hideProductStatus() {
+            productStatus.style.display = 'none';
+        }
+
+        // Navigation
+        function goToDetail(productId) {
+            window.location.href = 'Page/detail.html?id=' + productId;
+        }
+
+        // Add to cart and redirect to cart page
+        function buyNow(productId) {
+            const product = allProducts.find(item => String(item.id) === String(productId));
+            if (!product) return;
+
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart = Array.isArray(cart) ? cart : Object.values(cart).filter(item => item && typeof item === 'object');
+
+            const existingItem = cart.find(item => String(item.id) === String(product.id));
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    category: product.category,
+                    qty: 1
+                });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            if (window.showToast) showToast('Produk berhasil ditambahkan ke keranjang.', 'success');
+            window.location.href = 'Page/cart.html';
+        }
+
+        function renderProducts(products) {
+            productsGrid.innerHTML = '';
+
+            if (products.length === 0) {
+                showProductStatus(allProducts.length === 0 ? 'Belum ada produk.' : 'Produk tidak ditemukan.', 'empty');
+                if (allProducts.length > 0 && window.showToast) {
+                    const emptyKey = `${searchInput.value.trim()}|${categoryFilter.value}|${sortSelect.value}`;
+                    if (emptyKey !== lastEmptyToastKey) {
+                        showToast('Produk tidak ditemukan.', 'info');
+                        lastEmptyToastKey = emptyKey;
+                    }
+                }
+                return;
+            }
+
+            hideProductStatus();
+            lastEmptyToastKey = '';
+
+            products.forEach((product, index) => {
+                const delay = (index * 0.05) + 's';
+                const productId = product.id;
+                const productName = escapeHTML(product.name);
+                const productCategory = escapeHTML(product.category);
+                const productImage = escapeHTML(product.image);
+
+                const html = `
+                    <article class="product-card" onclick="goToDetail('${productId}')" style="animation-delay: ${delay}">
+                        <div class="product-image-container">
+                            <img src="${productImage}" alt="${productName}" class="product-image">
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">${productCategory}</span>
+                            <h3 class="product-name">${productName}</h3>
+                            <p class="price">${formatRupiah(product.price)}</p>
+                            <button class="btn buy-btn" onclick="event.stopPropagation(); buyNow('${productId}')">Beli</button>
+                        </div>
+                    </article>
+                `;
+
+                productsGrid.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function applyFilters() {
+            const keyword = searchInput.value.trim().toLowerCase();
+            const selectedCategory = categoryFilter.value;
+            const selectedSort = sortSelect.value;
+
+            let filteredProducts = allProducts.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(keyword);
+                const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+
+                return matchesSearch && matchesCategory;
+            });
+
+            if (selectedSort === 'price-asc') {
+                filteredProducts.sort((a, b) => a.price - b.price);
+            } else if (selectedSort === 'price-desc') {
+                filteredProducts.sort((a, b) => b.price - a.price);
+            } else if (selectedSort === 'name-asc') {
+                filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (selectedSort === 'name-desc') {
+                filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+            }
+
+            renderProducts(filteredProducts);
+        }
+
+        function renderCategoryOptions() {
+            const categories = [...new Set(allProducts.map(product => product.category).filter(Boolean))].sort();
+            categoryFilter.innerHTML = '<option value="all">Semua</option>';
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+        }
+
+        // Fetch products from database
+        async function loadProducts() {
+            showProductStatus('Memuat produk...', 'loading');
+            productsGrid.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const data = await response.json();
+
+                if (!response.ok || !data.success || !Array.isArray(data.products)) {
+                    throw new Error('Gagal memuat produk.');
+                }
+
+                // Simpan data asli agar search, filter, dan sort berjalan di frontend.
+                allProducts = data.products.map(product => ({
+                    id: product.produk_id,
+                    name: product.nama_barang,
+                    category: product.kategori || 'Lainnya',
+                    price: parseInt(product.harga) || 0,
+                    image: getImageUrl(product.image || 'Assect/Img/backpack.png')
+                }));
+
+                renderCategoryOptions();
+                applyFilters();
+            } catch (err) {
+                productsGrid.innerHTML = '';
+                showProductStatus('Gagal memuat produk. Pastikan server backend sudah berjalan.', 'error');
+                if (window.showToast) showToast('Gagal memuat produk. Pastikan server backend sudah berjalan.', 'error');
+            }
+        }
+
+        searchInput.addEventListener('input', applyFilters);
+        categoryFilter.addEventListener('change', applyFilters);
+        sortSelect.addEventListener('change', applyFilters);
+
+        // Run on load
+        loadProducts();
+    </script>
+</body>
+
+</html>

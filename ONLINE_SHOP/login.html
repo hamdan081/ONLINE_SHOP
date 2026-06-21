@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace Login</title>
+    <meta name="description" content="Login atau daftar akun baru di Online Shop Marketplace.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="Assect/Css/style.css">
+    <link rel="stylesheet" href="Assect/Css/toast.css">
+    <script src="Assect/Js/toast.js"></script>
+</head>
+<body class="login-page-body">
+    <main class="auth-page">
+        <!-- ===================== LOGIN DESKTOP LAYOUT ===================== -->
+        <section id="loginCard" class="login-card animate-up">
+            <div class="login-branding-panel">
+                <div class="login-branding-content">
+                    <div class="login-brand">
+                        <span class="brand-mark">M</span>
+                        <div>
+                            <p class="login-eyebrow">Online Shop</p>
+                            <span class="login-brand-name">Marketplace</span>
+                        </div>
+                    </div>
+
+                    <div class="login-copy">
+                        <h1 class="login-title">Selamat Datang Kembali</h1>
+                        <p class="login-subtitle">Masuk ke akunmu untuk melanjutkan belanja dan melihat pesanan.</p>
+                    </div>
+
+                    <div class="market-visual" aria-hidden="true">
+                        <div class="visual-card visual-card-main">
+                            <span class="visual-badge">Promo Hari Ini</span>
+                            <strong>Diskon hingga 35%</strong>
+                            <small>Untuk produk pilihan marketplace</small>
+                        </div>
+                        <div class="visual-card visual-card-small visual-card-top">
+                            <span>&#128722;</span>
+                            <strong>Checkout</strong>
+                        </div>
+                        <div class="visual-card visual-card-small visual-card-bottom">
+                            <span>&#128230;</span>
+                            <strong>Pesanan</strong>
+                        </div>
+                    </div>
+
+                    <ul class="login-features">
+                        <li>
+                            <span class="feature-check">&#10003;</span>
+                            <span>Belanja lebih mudah</span>
+                        </li>
+                        <li>
+                            <span class="feature-check">&#10003;</span>
+                            <span>Produk lengkap</span>
+                        </li>
+                        <li>
+                            <span class="feature-check">&#10003;</span>
+                            <span>Checkout cepat</span>
+                        </li>
+                        <li>
+                            <span class="feature-check">&#10003;</span>
+                            <span>Riwayat pesanan tersimpan</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="login-decor login-decor-1"></div>
+                <div class="login-decor login-decor-2"></div>
+            </div>
+
+            <div class="login-form-panel">
+                <div class="login-form-card">
+                    <div class="login-form-header">
+                        <p class="login-form-eyebrow">Masuk akun</p>
+                        <h2 class="login-form-title">Login Marketplace</h2>
+                        <p class="login-form-subtitle">Gunakan username atau email yang sudah terdaftar.</p>
+                    </div>
+
+                    <p id="formMessage" class="form-message" aria-live="polite"></p>
+
+                    <form id="loginForm" novalidate>
+                        <div class="input-container">
+                            <label for="username" class="field-label">Username atau Email</label>
+                            <div class="input-group">
+                                <span class="input-icon" aria-hidden="true">&#9993;</span>
+                                <input id="username" name="username" type="text" placeholder="Masukkan username atau email" autocomplete="username">
+                            </div>
+                            <p id="usernameError" class="field-error"></p>
+                        </div>
+
+                        <div class="input-container">
+                            <label for="password" class="field-label">Password</label>
+                            <div class="input-group password-group">
+                                <span class="input-icon" aria-hidden="true">&#128274;</span>
+                                <input id="password" name="password" type="password" placeholder="Masukkan password" autocomplete="current-password">
+                                <button type="button" id="togglePassword" class="toggle-password" aria-label="Tampilkan password">Lihat</button>
+                            </div>
+                            <p id="passwordError" class="field-error"></p>
+                        </div>
+
+                        <button type="submit" id="loginButton" class="btn login-btn">Login</button>
+                    </form>
+
+                    <p class="auth-switch-link">
+                        Belum punya akun? <a href="#" id="showRegister">Daftar sekarang</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== REGISTER CARD (Desktop Two-Column) ===================== -->
+        <section id="registerCard" class="register-desktop-wrapper animate-up" style="display:none;">
+
+            <!-- ====== LEFT: Branding Panel ====== -->
+            <div class="register-branding-panel">
+                <div class="branding-content">
+                    <!-- Logo -->
+                    <div class="branding-logo">
+                        <span class="branding-logo-icon">M</span>
+                        <span class="branding-logo-text">Marketplace</span>
+                    </div>
+
+                    <h2 class="branding-headline">Selamat Datang di<br>Online Shop</h2>
+                    <p class="branding-tagline">Daftar akun untuk mulai berbelanja produk favoritmu dengan mudah.</p>
+
+                    <!-- Feature Points -->
+                    <ul class="branding-features">
+                        <li>
+                            <span class="feature-icon">🛒</span>
+                            <div>
+                                <strong>Belanja Mudah</strong>
+                                <span>Temukan ribuan produk dalam satu platform</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="feature-icon">📦</span>
+                            <div>
+                                <strong>Produk Lengkap</strong>
+                                <span>Berbagai kategori sesuai kebutuhanmu</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="feature-icon">⚡</span>
+                            <div>
+                                <strong>Checkout Cepat</strong>
+                                <span>Proses pesanan instan tanpa ribet</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="feature-icon">📋</span>
+                            <div>
+                                <strong>Riwayat Tersimpan</strong>
+                                <span>Lacak semua pesananmu kapan saja</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Decorative floating shapes -->
+                <div class="branding-decor branding-decor-1"></div>
+                <div class="branding-decor branding-decor-2"></div>
+                <div class="branding-decor branding-decor-3"></div>
+            </div>
+
+            <!-- ====== RIGHT: Register Form Panel ====== -->
+            <div class="register-form-panel">
+                <div class="register-form-header">
+                    <h1 class="register-form-title">Buat Akun Baru</h1>
+                    <p class="register-form-subtitle">Isi data di bawah untuk mendaftar</p>
+                </div>
+
+                <p id="registerMessage" class="form-message" aria-live="polite"></p>
+
+                <form id="registerForm" novalidate>
+                    <!-- Two-column grid for form fields on desktop -->
+                    <div class="register-form-grid">
+                        <!-- Username -->
+                        <div class="input-container">
+                            <label for="regUsername" class="field-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-icon" aria-hidden="true">&#128100;</span>
+                                <input id="regUsername" name="username" type="text" placeholder="Masukkan username" autocomplete="username">
+                            </div>
+                            <p id="regUsernameError" class="field-error"></p>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="input-container">
+                            <label for="regEmail" class="field-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-icon" aria-hidden="true">&#9993;</span>
+                                <input id="regEmail" name="email" type="email" placeholder="Masukkan email aktif" autocomplete="email">
+                            </div>
+                            <p id="regEmailError" class="field-error"></p>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="input-container">
+                            <label for="regPassword" class="field-label">Password</label>
+                            <div class="input-group password-group">
+                                <span class="input-icon" aria-hidden="true">&#128274;</span>
+                                <input id="regPassword" name="password" type="password" placeholder="Minimal 5 karakter" autocomplete="new-password">
+                                <button type="button" class="toggle-password" data-target="regPassword" aria-label="Tampilkan password">Lihat</button>
+                            </div>
+                            <p id="regPasswordError" class="field-error"></p>
+                        </div>
+
+                        <!-- Konfirmasi Password -->
+                        <div class="input-container">
+                            <label for="regConfirmPassword" class="field-label">Konfirmasi Password</label>
+                            <div class="input-group password-group">
+                                <span class="input-icon" aria-hidden="true">&#128274;</span>
+                                <input id="regConfirmPassword" name="confirmPassword" type="password" placeholder="Ulangi password" autocomplete="new-password">
+                                <button type="button" class="toggle-password" data-target="regConfirmPassword" aria-label="Tampilkan konfirmasi password">Lihat</button>
+                            </div>
+                            <p id="regConfirmPasswordError" class="field-error"></p>
+                        </div>
+
+                        <!-- Alamat (spans full width) -->
+                        <div class="input-container register-field-full">
+                            <label for="regAlamat" class="field-label">Alamat</label>
+                            <div class="input-group">
+                                <span class="input-icon" aria-hidden="true">&#127968;</span>
+                                <input id="regAlamat" name="alamat" type="text" placeholder="Masukkan alamat lengkap" autocomplete="street-address">
+                            </div>
+                            <p id="regAlamatError" class="field-error"></p>
+                        </div>
+
+                        <!-- Nomor HP (spans full width) -->
+                        <div class="input-container register-field-full">
+                            <label for="regNoHp" class="field-label">Nomor HP</label>
+                            <div class="input-group">
+                                <span class="input-icon" aria-hidden="true">&#128222;</span>
+                                <input id="regNoHp" name="no_hp" type="tel" placeholder="Contoh: 081234567890" autocomplete="tel">
+                            </div>
+                            <p id="regNoHpError" class="field-error"></p>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="registerButton" class="btn login-btn register-btn">Daftar</button>
+                </form>
+
+                <p class="auth-switch-link">
+                    Sudah punya akun? <a href="#" id="showLogin">Login sekarang</a>
+                </p>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        const API_BASE = "http://localhost:3000/api";
+
+        // ===================== LOGIN LOGIC (unchanged) =====================
+        const loginCard = document.getElementById("loginCard");
+        const registerCard = document.getElementById("registerCard");
+        const loginForm = document.getElementById("loginForm");
+        const usernameInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const loginButton = document.getElementById("loginButton");
+        const togglePassword = document.getElementById("togglePassword");
+        const formMessage = document.getElementById("formMessage");
+        const usernameError = document.getElementById("usernameError");
+        const passwordError = document.getElementById("passwordError");
+
+        function clearMessages() {
+            formMessage.textContent = "";
+            formMessage.className = "form-message";
+            usernameError.textContent = "";
+            passwordError.textContent = "";
+        }
+
+        function showMessage(message, type = "error") {
+            formMessage.textContent = message;
+            formMessage.className = `form-message ${type}`;
+            if (window.showToast) {
+                showToast(message, type === "success" ? "success" : "error");
+            }
+        }
+
+        // Validasi input sebelum dikirim ke backend
+        function validateLoginInput() {
+            clearMessages();
+            let isValid = true;
+
+            if (!usernameInput.value.trim()) {
+                usernameError.textContent = "Email atau username wajib diisi.";
+                isValid = false;
+            }
+
+            if (!passwordInput.value.trim()) {
+                passwordError.textContent = "Password wajib diisi.";
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function setLoading(isLoading) {
+            loginButton.disabled = isLoading;
+            loginButton.textContent = isLoading ? "Memproses..." : "Login";
+        }
+
+        // Simpan data user sementara. Password tidak disimpan.
+        function saveUserSession(user) {
+            const safeUser = { ...user };
+            delete safeUser.password;
+            localStorage.setItem("currentUser", JSON.stringify(safeUser));
+        }
+
+        function redirectByRole(user) {
+            const role = (user.role || user.user_role || "").toString().toLowerCase();
+            const isAdmin = role === "admin" || user.username?.toLowerCase() === "admin";
+
+            window.location.href = isAdmin ? "Admin/dashboard.html" : "home.html";
+        }
+
+        // Proses fetch login ke backend API
+        loginForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            if (!validateLoginInput()) {
+                showMessage("Periksa kembali data login Anda.");
+                if (window.showToast) showToast("Email/username dan password wajib diisi.", "warning");
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const response = await fetch(`${API_BASE}/users/login`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: usernameInput.value.trim(),
+                        password: passwordInput.value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || "Login gagal. Silakan coba lagi.");
+                }
+
+                saveUserSession(data.user);
+                showMessage("Login berhasil. Mengalihkan halaman...", "success");
+                redirectByRole(data.user);
+            } catch (error) {
+                showMessage(error.message || "Tidak dapat terhubung ke server.");
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        togglePassword.addEventListener("click", function () {
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+            togglePassword.textContent = isPassword ? "Sembunyi" : "Lihat";
+            togglePassword.setAttribute("aria-label", isPassword ? "Sembunyikan password" : "Tampilkan password");
+        });
+
+        // ===================== TOGGLE LOGIN / REGISTER VIEW =====================
+        const showRegisterLink = document.getElementById("showRegister");
+        const showLoginLink = document.getElementById("showLogin");
+
+        showRegisterLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            loginCard.style.display = "none";
+            registerCard.style.display = "";
+            // Re-trigger animation
+            registerCard.classList.remove("animate-up");
+            void registerCard.offsetWidth; // force reflow
+            registerCard.classList.add("animate-up");
+            clearRegisterMessages();
+        });
+
+        showLoginLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            registerCard.style.display = "none";
+            loginCard.style.display = "";
+            // Re-trigger animation
+            loginCard.classList.remove("animate-up");
+            void loginCard.offsetWidth;
+            loginCard.classList.add("animate-up");
+            clearMessages();
+        });
+
+        // ===================== REGISTER LOGIC =====================
+        const registerForm = document.getElementById("registerForm");
+        const registerButton = document.getElementById("registerButton");
+        const registerMessage = document.getElementById("registerMessage");
+
+        const regFields = {
+            username: document.getElementById("regUsername"),
+            email: document.getElementById("regEmail"),
+            password: document.getElementById("regPassword"),
+            confirmPassword: document.getElementById("regConfirmPassword"),
+            alamat: document.getElementById("regAlamat"),
+            noHp: document.getElementById("regNoHp")
+        };
+
+        const regErrors = {
+            username: document.getElementById("regUsernameError"),
+            email: document.getElementById("regEmailError"),
+            password: document.getElementById("regPasswordError"),
+            confirmPassword: document.getElementById("regConfirmPasswordError"),
+            alamat: document.getElementById("regAlamatError"),
+            noHp: document.getElementById("regNoHpError")
+        };
+
+        function clearRegisterMessages() {
+            registerMessage.textContent = "";
+            registerMessage.className = "form-message";
+            Object.values(regErrors).forEach(el => el.textContent = "");
+        }
+
+        function showRegisterMessage(message, type = "error") {
+            registerMessage.textContent = message;
+            registerMessage.className = `form-message ${type}`;
+            if (window.showToast) {
+                showToast(message, type === "success" ? "success" : "error");
+            }
+        }
+
+        function validateRegisterInput() {
+            clearRegisterMessages();
+            let isValid = true;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneRegex = /^[0-9]+$/;
+
+            if (!regFields.username.value.trim()) {
+                regErrors.username.textContent = "Username wajib diisi.";
+                isValid = false;
+            }
+
+            if (!regFields.email.value.trim()) {
+                regErrors.email.textContent = "Email wajib diisi.";
+                isValid = false;
+            } else if (!emailRegex.test(regFields.email.value.trim())) {
+                regErrors.email.textContent = "Format email tidak valid.";
+                isValid = false;
+            }
+
+            if (!regFields.password.value) {
+                regErrors.password.textContent = "Password wajib diisi.";
+                isValid = false;
+            } else if (regFields.password.value.length < 5) {
+                regErrors.password.textContent = "Password minimal 5 karakter.";
+                isValid = false;
+            }
+
+            if (!regFields.confirmPassword.value) {
+                regErrors.confirmPassword.textContent = "Konfirmasi password wajib diisi.";
+                isValid = false;
+            } else if (regFields.password.value !== regFields.confirmPassword.value) {
+                regErrors.confirmPassword.textContent = "Konfirmasi password tidak cocok.";
+                isValid = false;
+            }
+
+            if (!regFields.alamat.value.trim()) {
+                regErrors.alamat.textContent = "Alamat wajib diisi.";
+                isValid = false;
+            }
+
+            if (!regFields.noHp.value.trim()) {
+                regErrors.noHp.textContent = "Nomor HP wajib diisi.";
+                isValid = false;
+            } else if (!phoneRegex.test(regFields.noHp.value.trim())) {
+                regErrors.noHp.textContent = "Nomor HP hanya boleh berisi angka.";
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function setRegisterLoading(isLoading) {
+            registerButton.disabled = isLoading;
+            registerButton.textContent = isLoading ? "Mendaftarkan..." : "Daftar";
+        }
+
+        registerForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            if (!validateRegisterInput()) {
+                showRegisterMessage("Periksa kembali data pendaftaran Anda.");
+                return;
+            }
+
+            setRegisterLoading(true);
+
+            try {
+                const response = await fetch(`${API_BASE}/users/register`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: regFields.username.value.trim(),
+                        email: regFields.email.value.trim(),
+                        password: regFields.password.value,
+                        alamat: regFields.alamat.value.trim(),
+                        no_hp: regFields.noHp.value.trim()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || "Registrasi gagal. Silakan coba lagi.");
+                }
+
+                // Success: show toast, clear form, go back to login
+                if (window.showToast) showToast(data.message || "Registrasi berhasil. Silakan login.", "success");
+
+                registerForm.reset();
+                clearRegisterMessages();
+
+                // Switch back to login after short delay
+                setTimeout(function () {
+                    registerCard.style.display = "none";
+                    loginCard.style.display = "";
+                    loginCard.classList.remove("animate-up");
+                    void loginCard.offsetWidth;
+                    loginCard.classList.add("animate-up");
+                }, 1200);
+
+            } catch (error) {
+                showRegisterMessage(error.message || "Tidak dapat terhubung ke server.");
+            } finally {
+                setRegisterLoading(false);
+            }
+        });
+
+        // ===================== SHOW/HIDE PASSWORD (Register) =====================
+        document.querySelectorAll("#registerCard .toggle-password").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                const targetId = btn.getAttribute("data-target");
+                const targetInput = document.getElementById(targetId);
+                const isPassword = targetInput.type === "password";
+                targetInput.type = isPassword ? "text" : "password";
+                btn.textContent = isPassword ? "Sembunyi" : "Lihat";
+                btn.setAttribute("aria-label", isPassword ? "Sembunyikan password" : "Tampilkan password");
+            });
+        });
+    </script>
+</body>
+</html>
