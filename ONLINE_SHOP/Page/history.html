@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Transaksi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../Assect/Css/style.css">
+    <link rel="stylesheet" href="../Assect/Css/toast.css">
+    <script src="../Assect/Js/toast.js"></script>
+    <style>
+        .history-page-body {
+            background-color: var(--bg-surface);
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+
+        .history-container {
+            max-width: 980px;
+            margin: 30px auto;
+            padding: 0 18px 40px;
+        }
+
+        .back-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .back-nav:hover {
+            color: var(--primary);
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dark);
+            font-size: 1.55rem;
+            font-weight: 800;
+            margin-bottom: 22px;
+        }
+
+        .page-title svg,
+        .back-nav svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .page-title svg {
+            color: var(--primary);
+        }
+
+        .history-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .history-card,
+        .history-state {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            border-radius: 14px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .history-card {
+            padding: 18px;
+            display: grid;
+            gap: 14px;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: slideUpStagger 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUpStagger {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 12px;
+        }
+
+        .tx-id {
+            color: var(--text-dark);
+            font-weight: 800;
+            font-size: 0.98rem;
+        }
+
+        .tx-date {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-top: 3px;
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .status-badge {
+            width: fit-content;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            line-height: 1;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .status-diproses,
+        .status-menunggu {
+            background-color: #FEF3C7;
+            color: #92400E;
+            border-color: #FDE68A;
+        }
+
+        .status-dikirim {
+            background-color: #DBEAFE;
+            color: #1D4ED8;
+            border-color: #BFDBFE;
+        }
+
+        .status-selesai,
+        .status-lunas {
+            background-color: #DCFCE7;
+            color: #15803D;
+            border-color: #BBF7D0;
+        }
+
+        .status-dibatalkan,
+        .status-gagal {
+            background-color: #FEE2E2;
+            color: #B42318;
+            border-color: #FECDCA;
+        }
+
+        .status-netral {
+            background-color: #F1F5F9;
+            color: #475569;
+            border-color: #E2E8F0;
+        }
+
+        .item-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .item-name-qty {
+            color: var(--text-dark);
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .item-meta {
+            color: var(--text-muted);
+            font-size: 0.84rem;
+            margin-top: 2px;
+        }
+
+        .item-price {
+            color: var(--text-dark);
+            font-weight: 800;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            border-top: 1px solid var(--border-light);
+            padding-top: 14px;
+        }
+
+        .total-label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 3px;
+        }
+
+        .total-val {
+            color: var(--success);
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .detail-btn,
+        .shop-now-btn {
+            border: none;
+            border-radius: 9px;
+            background-color: var(--primary);
+            color: #FFFFFF;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 800;
+            padding: 10px 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .detail-btn:hover,
+        .shop-now-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .history-state {
+            padding: 34px 20px;
+            color: var(--text-muted);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .history-state.error {
+            color: #B42318;
+            background-color: #FEF3F2;
+            border-color: #FECDCA;
+        }
+
+        .history-state svg {
+            width: 58px;
+            height: 58px;
+            color: #94A3B8;
+            margin-bottom: 14px;
+        }
+
+        .history-state h3 {
+            color: var(--text-dark);
+            font-size: 1.15rem;
+            margin-bottom: 7px;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background-color: rgba(15, 23, 42, 0.45);
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .transaction-modal {
+            width: min(620px, 100%);
+            max-height: 86vh;
+            overflow: auto;
+            background-color: #FFFFFF;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 22px 60px rgba(15, 23, 42, 0.25);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+        }
+
+        .modal-title {
+            color: var(--text-dark);
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 50%;
+            background-color: #F1F5F9;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .detail-grid {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .detail-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .detail-line strong {
+            color: var(--text-dark);
+            text-align: right;
+        }
+
+        @media (max-width: 640px) {
+            .history-container {
+                margin-top: 20px;
+                padding: 0 14px 30px;
+            }
+
+            .card-header,
+            .card-footer,
+            .detail-line {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .badge-group {
+                justify-content: flex-start;
+            }
+
+            .item-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .item-price {
+                text-align: left;
+            }
+
+            .detail-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="history-page-body">
+    <header class="site-header">
+        <a href="../home.html" class="brand">Marketplace</a>
+        <div class="header-actions">
+            <a href="cart.html" class="icon-btn" aria-label="Keranjang">
+                <i data-lucide="shopping-cart"></i>
+            </a>
+            <a href="profile.html" class="icon-btn" aria-label="Profil">
+                <i data-lucide="user"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="history-container">
+        <a href="../home.html" class="back-nav">
+            <i data-lucide="arrow-left"></i>
+            <span>Kembali ke Beranda</span>
+        </a>
+
+        <h1 class="page-title">
+            <i data-lucide="history"></i>
+            <span>Riwayat Transaksi</span>
+        </h1>
+
+        <section class="history-list" id="history-list-container">
+            <div class="history-state">
+                <div class="loading-spinner"></div>
+                <p>Memuat riwayat transaksi...</p>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-backdrop" id="transactionModal">
+        <section class="transaction-modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Detail Transaksi</h2>
+                <button class="modal-close" id="modalClose" aria-label="Tutup">x</button>
+            </div>
+            <div id="modalContent"></div>
+        </section>
+    </div>
+
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        const API_BASE = "http://localhost:3000/api";
+        let transactionHistory = [];
+
+        const historyContainer = document.getElementById('history-list-container');
+        const transactionModal = document.getElementById('transactionModal');
+        const modalContent = document.getElementById('modalContent');
+        const modalTitle = document.getElementById('modalTitle');
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0
+            }).format(number || 0);
+        }
+
+        function formatTanggal(value) {
+            if (!value) return '-';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return value;
+            return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function escapeHTML(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getUser() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('user') || '{}');
+            if (!user.id) {
+                window.location.href = '../login.html';
+                return null;
+            }
+            return user;
+        }
+
+        function getStatusClass(status) {
+            const value = String(status || '').toLowerCase();
+            if (value.includes('selesai') || value.includes('lunas')) return 'status-selesai';
+            if (value.includes('kirim')) return 'status-dikirim';
+            if (value.includes('batal')) return 'status-dibatalkan';
+            if (value.includes('menunggu')) return 'status-menunggu';
+            if (value.includes('proses')) return 'status-diproses';
+            if (value.includes('gagal')) return 'status-gagal';
+            return 'status-netral';
+        }
+
+        function normalizeTransaction(tx) {
+            return {
+                id: tx.id || tx.order_id || '-',
+                date: tx.date || tx.tanggal_order || tx.tanggal || '',
+                total: parseFloat(tx.total || tx.total_harga || 0),
+                orderStatus: tx.status || tx.status_order || 'Diproses',
+                paymentStatus: tx.status_pembayaran || tx.payment_status || '-',
+                paymentMethod: tx.metode_pembayaran || tx.payment_method || '-',
+                items: Array.isArray(tx.items) ? tx.items : []
+            };
+        }
+
+        async function fetchTransactionHistory() {
+            const user = getUser();
+            if (!user) return;
+
+            historyContainer.innerHTML = '<div class="history-state"><div class="loading-spinner"></div><p>Memuat riwayat transaksi...</p></div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/orders/user/${user.id}`);
+                const data = await response.json();
+
+                if (!response.ok || !data.success || !Array.isArray(data.history)) {
+                    throw new Error('Gagal memuat riwayat transaksi.');
+                }
+
+                transactionHistory = data.history.map(normalizeTransaction);
+                renderTransactionHistory(transactionHistory);
+            } catch (error) {
+                renderErrorState();
+            }
+        }
+
+        function renderEmptyState() {
+            if (window.showToast) showToast('Belum ada transaksi.', 'info');
+            historyContainer.innerHTML = `
+                <div class="history-state">
+                    <i data-lucide="calendar-x"></i>
+                    <h3>Belum ada transaksi.</h3>
+                    <p>Mulai belanja dan transaksi Anda akan tampil di sini.</p>
+                    <a href="../home.html" class="shop-now-btn">Mulai Belanja</a>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderErrorState() {
+            if (window.showToast) showToast('Gagal memuat riwayat transaksi. Pastikan server backend sudah berjalan.', 'error');
+            historyContainer.innerHTML = `
+                <div class="history-state error">
+                    Gagal memuat riwayat transaksi. Pastikan server backend sudah berjalan.
+                </div>
+            `;
+        }
+
+        function renderTransactionHistory(history) {
+            historyContainer.innerHTML = '';
+
+            if (history.length === 0) {
+                renderEmptyState();
+                return;
+            }
+
+            history.forEach((tx, index) => {
+                const items = tx.items || [];
+                const itemRows = items.length > 0
+                    ? items.map(item => `
+                        <div class="item-row">
+                            <div>
+                                <div class="item-name-qty">${escapeHTML(item.name || 'Produk')}</div>
+                                <div class="item-meta">Jumlah: ${item.qty || 0}</div>
+                            </div>
+                            <div class="item-price">${formatRupiah(item.price || 0)}</div>
+                        </div>
+                    `).join('')
+                    : '<div class="item-meta">Detail produk tidak tersedia.</div>';
+
+                const html = `
+                    <article class="history-card" style="animation-delay: ${index * 0.05}s">
+                        <div class="card-header">
+                            <div>
+                                <div class="tx-id">${escapeHTML(tx.id)}</div>
+                                <div class="tx-date">${formatTanggal(tx.date)}</div>
+                            </div>
+                            <div class="badge-group">
+                                <span class="status-badge ${getStatusClass(tx.orderStatus)}">${escapeHTML(tx.orderStatus)}</span>
+                                <span class="status-badge ${getStatusClass(tx.paymentStatus)}">${escapeHTML(tx.paymentStatus)}</span>
+                            </div>
+                        </div>
+                        <div class="item-list">${itemRows}</div>
+                        <div class="card-footer">
+                            <div>
+                                <span class="total-label">Total Pembayaran</span>
+                                <span class="total-val">${formatRupiah(tx.total)}</span>
+                            </div>
+                            <button class="detail-btn" onclick="openTransactionDetail(${index})">Lihat Detail</button>
+                        </div>
+                    </article>
+                `;
+
+                historyContainer.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function openTransactionDetail(index) {
+            const tx = transactionHistory[index];
+            if (!tx) return;
+
+            modalTitle.textContent = `Detail ${tx.id}`;
+            const itemRows = tx.items.length > 0
+                ? tx.items.map(item => `
+                    <div class="item-row">
+                        <div>
+                            <div class="item-name-qty">${escapeHTML(item.name || 'Produk')}</div>
+                            <div class="item-meta">Jumlah: ${item.qty || 0}</div>
+                        </div>
+                        <div class="item-price">${formatRupiah(item.price || 0)}</div>
+                    </div>
+                `).join('')
+                : '<p class="item-meta">Detail produk tidak tersedia dari API.</p>';
+
+            modalContent.innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-line"><span>Tanggal</span><strong>${formatTanggal(tx.date)}</strong></div>
+                    <div class="detail-line"><span>Metode pembayaran</span><strong>${escapeHTML(tx.paymentMethod)}</strong></div>
+                    <div class="detail-line"><span>Status pesanan</span><strong>${escapeHTML(tx.orderStatus)}</strong></div>
+                    <div class="detail-line"><span>Status pembayaran</span><strong>${escapeHTML(tx.paymentStatus)}</strong></div>
+                    <div class="detail-line"><span>Total pembayaran</span><strong>${formatRupiah(tx.total)}</strong></div>
+                </div>
+                <div class="item-list">${itemRows}</div>
+            `;
+
+            transactionModal.classList.add('show');
+        }
+
+        document.getElementById('modalClose').addEventListener('click', function () {
+            transactionModal.classList.remove('show');
+        });
+
+        transactionModal.addEventListener('click', function (event) {
+            if (event.target === transactionModal) {
+                transactionModal.classList.remove('show');
+            }
+        });
+
+        fetchTransactionHistory();
+    </script>
+</body>
+</html>

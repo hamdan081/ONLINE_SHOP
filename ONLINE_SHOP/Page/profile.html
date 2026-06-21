@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Pengguna</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../Assect/Css/style.css">
+    <link rel="stylesheet" href="../Assect/Css/toast.css">
+    <script src="../Assect/Js/toast.js"></script>
+    <style>
+        .profile-page-body {
+            background-color: var(--bg-surface);
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+
+        .profile-container {
+            max-width: 980px;
+            margin: 30px auto;
+            padding: 0 18px 40px;
+        }
+
+        .back-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .back-nav:hover {
+            color: var(--primary);
+        }
+
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .profile-card,
+        .info-card,
+        .profile-state {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            border-radius: 16px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .profile-card {
+            padding: 28px;
+            text-align: center;
+        }
+
+        .info-card {
+            padding: 24px;
+        }
+
+        .profile-avatar {
+            width: 118px;
+            height: 118px;
+            border-radius: 50%;
+            border: 4px solid #FFFFFF;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+            object-fit: cover;
+            background-color: #F8FAFC;
+            margin-bottom: 18px;
+        }
+
+        .profile-name {
+            color: var(--text-dark);
+            font-size: 1.45rem;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 6px;
+        }
+
+        .profile-email {
+            color: var(--text-muted);
+            font-size: 0.94rem;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            word-break: break-word;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            border-radius: 999px;
+            padding: 7px 12px;
+            color: var(--primary);
+            background-color: rgba(47, 128, 237, 0.1);
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-bottom: 22px;
+        }
+
+        .profile-menu {
+            display: grid;
+            gap: 12px;
+        }
+
+        .profile-btn {
+            width: 100%;
+            min-height: 46px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.94rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .profile-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-edit {
+            background-color: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .btn-history {
+            background-color: #64748B;
+            color: #FFFFFF;
+        }
+
+        .btn-logout {
+            background-color: #EB5757;
+            color: #FFFFFF;
+        }
+
+        .btn-admin {
+            display: none;
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+        }
+
+        .profile-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--text-dark);
+            font-size: 1.12rem;
+            font-weight: 800;
+            margin-bottom: 18px;
+        }
+
+        .section-title svg,
+        .back-nav svg {
+            width: 19px;
+            height: 19px;
+            color: var(--primary);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .info-item {
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 14px;
+            background-color: #F8FAFC;
+        }
+
+        .info-label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .profile-state {
+            padding: 24px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .profile-state.error {
+            color: #B42318;
+            background-color: #FEF3F2;
+            border-color: #FECDCA;
+        }
+
+        @media (max-width: 760px) {
+            .profile-layout,
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="profile-page-body">
+    <header class="site-header">
+        <a href="../home.html" class="brand">Marketplace</a>
+        <div class="header-actions">
+            <a href="cart.html" class="icon-btn" aria-label="Keranjang">
+                <i data-lucide="shopping-cart"></i>
+            </a>
+            <a href="profile.html" class="icon-btn" aria-label="Profil" style="color: var(--primary);">
+                <i data-lucide="user"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="profile-container">
+        <a href="../home.html" class="back-nav">
+            <i data-lucide="arrow-left"></i>
+            <span>Kembali ke Beranda</span>
+        </a>
+
+        <div id="profileState" class="profile-state">
+            <div class="loading-spinner"></div>
+            <p>Memuat data profile...</p>
+        </div>
+
+        <section id="profileContent" class="profile-layout" style="display: none;">
+            <aside class="profile-card">
+                <img id="profileAvatar" src="../Assect/Img/avatar.png" alt="Foto Profil" class="profile-avatar">
+                <h1 id="profileName" class="profile-name">Belum diisi</h1>
+                <p id="profileEmail" class="profile-email">Belum diisi</p>
+                <span id="roleBadge" class="role-badge">User</span>
+
+                <div class="profile-menu">
+                    <a href="edit-profile.html" class="profile-btn btn-edit">
+                        <i data-lucide="user-cog"></i>
+                        <span>Edit Profile</span>
+                    </a>
+                    <a href="history.html" class="profile-btn btn-history">
+                        <i data-lucide="scroll"></i>
+                        <span>Riwayat Transaksi</span>
+                    </a>
+                    <button class="profile-btn btn-logout" onclick="logout()">
+                        <i data-lucide="log-out"></i>
+                        <span>Logout</span>
+                    </button>
+                    <a href="../Admin/dashboard.html" id="adminButton" class="profile-btn btn-admin">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Dashboard Admin</span>
+                    </a>
+                </div>
+            </aside>
+
+            <section class="info-card">
+                <h2 class="section-title">
+                    <i data-lucide="badge-info"></i>
+                    <span>Informasi Akun</span>
+                </h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Nama</span>
+                        <span id="infoName" class="info-value">Belum diisi</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span id="infoEmail" class="info-value">Belum diisi</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Role</span>
+                        <span id="infoRole" class="info-value">User</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Nomor HP</span>
+                        <span id="infoPhone" class="info-value">Belum diisi</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Alamat</span>
+                        <span id="infoAddress" class="info-value">Belum diisi</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Kampus</span>
+                        <span id="infoCampus" class="info-value">Belum diisi</span>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        const API_BASE = "http://localhost:3000/api";
+
+        function getUser() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('user') || '{}');
+            if (!user.id) {
+                window.location.href = '../login.html';
+                return null;
+            }
+            return user;
+        }
+
+        function valueOrEmpty(value) {
+            return value ? value : 'Belum diisi';
+        }
+
+        function getRole(user) {
+            const role = (user.role || user.user_role || '').toString().toLowerCase();
+            if (role === 'admin' || user.username?.toLowerCase() === 'admin') return 'Admin';
+            return 'User';
+        }
+
+        function getImagePath(path) {
+            if (!path) return '../Assect/Img/avatar.png';
+            if (path.startsWith('http') || path.startsWith('/') || path.startsWith('../')) return path;
+            return '../' + path;
+        }
+
+        function renderProfile(user) {
+            const role = getRole(user);
+            document.getElementById('profileAvatar').src = getImagePath(user.foto);
+            document.getElementById('profileName').textContent = valueOrEmpty(user.username || user.name);
+            document.getElementById('profileEmail').textContent = valueOrEmpty(user.email);
+            document.getElementById('roleBadge').textContent = role;
+
+            document.getElementById('infoName').textContent = valueOrEmpty(user.username || user.name);
+            document.getElementById('infoEmail').textContent = valueOrEmpty(user.email);
+            document.getElementById('infoRole').textContent = role;
+            document.getElementById('infoPhone').textContent = valueOrEmpty(user.no_hp || user.phone);
+            document.getElementById('infoAddress').textContent = valueOrEmpty(user.alamat);
+            document.getElementById('infoCampus').textContent = valueOrEmpty(user.kampus);
+
+            document.getElementById('adminButton').style.display = role === 'Admin' ? 'inline-flex' : 'none';
+            document.getElementById('profileState').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'grid';
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function loadProfileFromBackend() {
+            const user = getUser();
+            if (!user) return;
+
+            renderProfile(user);
+            const profileState = document.getElementById('profileState');
+            profileState.innerHTML = '<div class="loading-spinner"></div><p>Memuat data profile...</p>';
+            profileState.className = 'profile-state';
+            profileState.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_BASE}/users/profile/${user.id}`);
+                const data = await response.json();
+                if (!response.ok || !data.success || !data.user) {
+                    throw new Error('Gagal memuat profile.');
+                }
+
+                const mergedUser = { ...user, ...data.user };
+                localStorage.setItem('currentUser', JSON.stringify(mergedUser));
+                renderProfile(mergedUser);
+            } catch (error) {
+                const state = document.getElementById('profileState');
+                state.textContent = 'Gagal memuat data profile. Pastikan server backend sudah berjalan.';
+                state.className = 'profile-state error';
+                state.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            if (window.showToast) showToast('Logout berhasil.', 'success');
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('user');
+            localStorage.removeItem('cart');
+            setTimeout(() => {
+                window.location.href = '../login.html';
+            }, 450);
+        }
+
+        loadProfileFromBackend();
+    </script>
+</body>
+</html>

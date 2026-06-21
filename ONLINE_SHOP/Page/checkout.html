@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Pesanan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../Assect/Css/style.css">
+    <link rel="stylesheet" href="../Assect/Css/toast.css">
+    <script src="../Assect/Js/toast.js"></script>
+    <style>
+        .checkout-page-body {
+            background-color: var(--bg-surface);
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+
+        .checkout-container {
+            max-width: 1180px;
+            margin: 30px auto;
+            padding: 0 18px 40px;
+        }
+
+        .back-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .back-nav:hover {
+            color: var(--primary);
+        }
+
+        .back-nav svg,
+        .section-title svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .checkout-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .checkout-card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dark);
+            font-size: 1.08rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .section-title svg {
+            color: var(--primary);
+        }
+
+        .buyer-info {
+            display: grid;
+            gap: 10px;
+        }
+
+        .buyer-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .buyer-row strong {
+            color: var(--text-dark);
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .profile-warning,
+        .form-message {
+            display: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .profile-warning.show,
+        .form-message.error {
+            display: block;
+            color: #B42318;
+            background-color: #FEF3F2;
+            border: 1px solid #FECDCA;
+        }
+
+        .form-message.success {
+            display: block;
+            color: #027A48;
+            background-color: #ECFDF3;
+            border: 1px solid #ABEFC6;
+        }
+
+        .edit-profile-link,
+        .empty-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 9px;
+            background-color: var(--primary);
+            color: #FFFFFF;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .checkout-form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .field-group {
+            display: grid;
+            gap: 7px;
+        }
+
+        .field-group label {
+            color: var(--text-dark);
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .field-group input,
+        .field-group textarea {
+            width: 100%;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 12px 13px;
+            background-color: #F8FAFC;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: 0.94rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        }
+
+        .field-group textarea {
+            min-height: 92px;
+            resize: vertical;
+        }
+
+        .field-group input:focus,
+        .field-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.15);
+            background-color: #FFFFFF;
+        }
+
+        .field-error {
+            min-height: 17px;
+            color: #B42318;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .payment-options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .payment-option {
+            border: 1.5px solid var(--border-light);
+            border-radius: 11px;
+            padding: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .payment-option:hover,
+        .payment-option:has(input:checked) {
+            border-color: var(--primary);
+            background-color: #EDF5FF;
+        }
+
+        .payment-option input {
+            margin-top: 3px;
+            accent-color: var(--primary);
+        }
+
+        .payment-title {
+            display: block;
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 0.94rem;
+            margin-bottom: 3px;
+        }
+
+        .payment-desc {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            line-height: 1.45;
+        }
+
+        .order-summary {
+            position: sticky;
+            top: 88px;
+        }
+
+        .summary-items {
+            display: grid;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .summary-item {
+            display: grid;
+            grid-template-columns: 72px minmax(0, 1fr);
+            gap: 12px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .summary-img {
+            width: 72px;
+            height: 72px;
+            border-radius: 10px;
+            object-fit: cover;
+            background-color: #F8FAFC;
+            border: 1px solid var(--border-light);
+        }
+
+        .summary-name {
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1.4;
+            margin-bottom: 5px;
+        }
+
+        .summary-meta,
+        .summary-subtotal {
+            color: var(--text-muted);
+            font-size: 0.86rem;
+            line-height: 1.45;
+        }
+
+        .summary-subtotal {
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .payment-summary {
+            display: grid;
+            gap: 11px;
+            padding-top: 4px;
+        }
+
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            color: var(--text-muted);
+            font-size: 0.94rem;
+        }
+
+        .payment-row strong {
+            color: var(--text-dark);
+        }
+
+        .payment-row.total {
+            border-top: 1.5px dashed var(--border-light);
+            padding-top: 14px;
+            margin-top: 4px;
+            color: var(--text-dark);
+            font-size: 1.08rem;
+            font-weight: 800;
+        }
+
+        .payment-row.total strong {
+            color: var(--success);
+            font-size: 1.22rem;
+        }
+
+        .btn-confirm {
+            width: 100%;
+            min-height: 48px;
+            margin-top: 18px;
+            padding: 14px;
+            background-color: var(--success);
+            color: #FFFFFF;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 18px rgba(39, 174, 96, 0.2);
+        }
+
+        .btn-confirm:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(39, 174, 96, 0.28);
+        }
+
+        .btn-confirm:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .empty-checkout {
+            text-align: center;
+            padding: 44px 20px;
+        }
+
+        .empty-checkout svg {
+            width: 64px;
+            height: 64px;
+            color: #94A3B8;
+            margin-bottom: 16px;
+        }
+
+        .empty-checkout h2 {
+            color: var(--text-dark);
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+        }
+
+        .empty-checkout p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 860px) {
+            .checkout-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .order-summary {
+                position: static;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .checkout-container {
+                margin-top: 20px;
+                padding: 0 14px 30px;
+            }
+
+            .checkout-card {
+                padding: 18px;
+            }
+
+            .buyer-row {
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .buyer-row strong {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body class="checkout-page-body">
+    <header class="site-header">
+        <a href="../home.html" class="brand">Marketplace</a>
+        <div class="header-actions">
+            <a href="cart.html" class="icon-btn" aria-label="Keranjang">
+                <i data-lucide="shopping-cart"></i>
+            </a>
+            <a href="profile.html" class="icon-btn" aria-label="Profil">
+                <i data-lucide="user"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="checkout-container">
+        <a href="cart.html" class="back-nav">
+            <i data-lucide="arrow-left"></i>
+            <span>Kembali ke Keranjang</span>
+        </a>
+
+        <section id="emptyCheckout" class="checkout-card empty-checkout" style="display: none;">
+            <i data-lucide="shopping-bag"></i>
+            <h2>Keranjang masih kosong.</h2>
+            <p>Silakan pilih produk terlebih dahulu.</p>
+            <a href="../home.html" class="empty-action">Kembali Belanja</a>
+        </section>
+
+        <section id="checkoutContent" class="checkout-layout">
+            <div class="checkout-stack">
+                <section class="checkout-card">
+                    <h2 class="section-title">
+                        <i data-lucide="user-round"></i>
+                        <span>Data Pembeli</span>
+                    </h2>
+                    <div id="profileWarning" class="profile-warning">
+                        Data pembeli belum lengkap. Silakan lengkapi profil terlebih dahulu.
+                        <br>
+                        <a href="edit-profile.html" class="edit-profile-link">Edit Profil</a>
+                    </div>
+                    <div class="buyer-info" id="buyerInfo"></div>
+                </section>
+
+                <section class="checkout-card">
+                    <h2 class="section-title">
+                        <i data-lucide="map-pin"></i>
+                        <span>Alamat Pengiriman</span>
+                    </h2>
+                    <div class="checkout-form">
+                        <div class="field-group">
+                            <label for="recipientName">Nama Penerima</label>
+                            <input type="text" id="recipientName" placeholder="Nama penerima">
+                            <span id="recipientNameError" class="field-error"></span>
+                        </div>
+                        <div class="field-group">
+                            <label for="phoneNumber">Nomor HP</label>
+                            <input type="tel" id="phoneNumber" placeholder="08xxxxxxxxxx">
+                            <span id="phoneNumberError" class="field-error"></span>
+                        </div>
+                        <div class="field-group">
+                            <label for="shippingAddress">Alamat Lengkap</label>
+                            <textarea id="shippingAddress" placeholder="Nama jalan, nomor rumah, kecamatan, kota"></textarea>
+                            <span id="shippingAddressError" class="field-error"></span>
+                        </div>
+                        <div class="field-group">
+                            <label for="orderNote">Catatan Pesanan</label>
+                            <textarea id="orderNote" placeholder="Opsional, contoh: titip ke satpam"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="checkout-card">
+                    <h2 class="section-title">
+                        <i data-lucide="credit-card"></i>
+                        <span>Metode Pembayaran</span>
+                    </h2>
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="Transfer Bank">
+                            <span>
+                                <span class="payment-title">Transfer Bank</span>
+                                <span class="payment-desc">Virtual Account bank pilihan.</span>
+                            </span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="E-Wallet">
+                            <span>
+                                <span class="payment-title">E-Wallet</span>
+                                <span class="payment-desc">Dana, OVO, GoPay, atau ShopeePay.</span>
+                            </span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="COD">
+                            <span>
+                                <span class="payment-title">COD</span>
+                                <span class="payment-desc">Bayar saat pesanan diterima.</span>
+                            </span>
+                        </label>
+                    </div>
+                    <span id="paymentError" class="field-error"></span>
+                </section>
+            </div>
+
+            <aside class="checkout-card order-summary">
+                <h2 class="section-title">
+                    <i data-lucide="receipt"></i>
+                    <span>Ringkasan Pesanan</span>
+                </h2>
+                <div class="summary-items" id="summaryContainer"></div>
+
+                <div class="payment-summary">
+                    <div class="payment-row">
+                        <span>Total harga produk</span>
+                        <strong id="productTotal">Rp 0</strong>
+                    </div>
+                    <div class="payment-row">
+                        <span>Ongkir</span>
+                        <strong id="shippingCost">Rp 0</strong>
+                    </div>
+                    <div class="payment-row total">
+                        <span>Total pembayaran</span>
+                        <strong id="paymentTotal">Rp 0</strong>
+                    </div>
+                </div>
+
+                <p id="checkoutMessage" class="form-message"></p>
+                <button class="btn btn-confirm" id="submitButton">Buat Pesanan</button>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        const API_BASE = "http://localhost:3000/api";
+        const SHIPPING_COST = 0;
+        let checkoutItemsList = [];
+        let productTotalValue = 0;
+
+        const emptyCheckout = document.getElementById('emptyCheckout');
+        const checkoutContent = document.getElementById('checkoutContent');
+        const summaryContainer = document.getElementById('summaryContainer');
+        const buyerInfo = document.getElementById('buyerInfo');
+        const profileWarning = document.getElementById('profileWarning');
+        const checkoutMessage = document.getElementById('checkoutMessage');
+        const submitButton = document.getElementById('submitButton');
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0
+            }).format(number || 0);
+        }
+
+        function escapeHTML(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getImagePath(imagePath) {
+            if (!imagePath) return "../Assect/Img/avatar.png";
+            if (imagePath.startsWith('http') || imagePath.startsWith('/') || imagePath.startsWith('../')) {
+                return imagePath;
+            }
+            if (imagePath.startsWith('./')) {
+                return '.' + imagePath;
+            }
+            return '../' + imagePath;
+        }
+
+        function getCart() {
+            const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const cartArray = Array.isArray(storedCart)
+                ? storedCart
+                : Object.values(storedCart).filter(item => item && typeof item === 'object');
+
+            return cartArray
+                .map(item => ({
+                    id: item.id,
+                    name: item.name || 'Produk tanpa nama',
+                    price: parseInt(item.price) || 0,
+                    image: item.image || item.img || '',
+                    qty: Math.max(1, parseInt(item.qty) || 1)
+                }))
+                .filter(item => item.id !== undefined && item.id !== null);
+        }
+
+        function getUser() {
+            return JSON.parse(localStorage.getItem('currentUser') || '{}');
+        }
+
+        function calculateTotal(cart) {
+            return cart.reduce((total, item) => total + (item.price * item.qty), 0);
+        }
+
+        function renderBuyerData() {
+            const user = getUser();
+            const name = user.username || user.name || '-';
+            const email = user.email || '-';
+            const address = user.alamat || '';
+            const campus = user.kampus || '-';
+
+            buyerInfo.innerHTML = `
+                <div class="buyer-row"><span>Nama</span><strong>${escapeHTML(name)}</strong></div>
+                <div class="buyer-row"><span>Email</span><strong>${escapeHTML(email)}</strong></div>
+                <div class="buyer-row"><span>Alamat Profil</span><strong>${escapeHTML(address || '-')}</strong></div>
+                <div class="buyer-row"><span>Kampus</span><strong>${escapeHTML(campus)}</strong></div>
+            `;
+
+            if (!user.username || !user.email || !address) {
+                profileWarning.classList.add('show');
+            }
+
+            document.getElementById('recipientName').value = user.username || '';
+            document.getElementById('shippingAddress').value = address || '';
+        }
+
+        function renderOrderSummary() {
+            const cart = getCart();
+
+            if (cart.length === 0) {
+                checkoutContent.style.display = 'none';
+                emptyCheckout.style.display = 'block';
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            checkoutContent.style.display = 'grid';
+            emptyCheckout.style.display = 'none';
+            summaryContainer.innerHTML = '';
+
+            productTotalValue = calculateTotal(cart);
+            checkoutItemsList = cart.map(item => ({
+                id: item.id,
+                key: String(item.id),
+                name: item.name,
+                qty: item.qty,
+                price: item.price * item.qty
+            }));
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.qty;
+                const itemName = escapeHTML(item.name);
+                const imagePath = escapeHTML(getImagePath(item.image));
+                const html = `
+                    <article class="summary-item">
+                        <img src="${imagePath}" alt="${itemName}" class="summary-img">
+                        <div>
+                            <h3 class="summary-name">${itemName}</h3>
+                            <p class="summary-meta">${formatRupiah(item.price)} x ${item.qty}</p>
+                            <p class="summary-subtotal">Subtotal: ${formatRupiah(subtotal)}</p>
+                        </div>
+                    </article>
+                `;
+                summaryContainer.insertAdjacentHTML('beforeend', html);
+            });
+
+            document.getElementById('productTotal').textContent = formatRupiah(productTotalValue);
+            document.getElementById('shippingCost').textContent = formatRupiah(SHIPPING_COST);
+            document.getElementById('paymentTotal').textContent = formatRupiah(productTotalValue + SHIPPING_COST);
+        }
+
+        function clearErrors() {
+            checkoutMessage.textContent = '';
+            checkoutMessage.className = 'form-message';
+            document.getElementById('recipientNameError').textContent = '';
+            document.getElementById('phoneNumberError').textContent = '';
+            document.getElementById('shippingAddressError').textContent = '';
+            document.getElementById('paymentError').textContent = '';
+        }
+
+        function showMessage(message, type = 'error') {
+            checkoutMessage.textContent = message;
+            checkoutMessage.className = `form-message ${type}`;
+            if (window.showToast) {
+                showToast(message, type === 'success' ? 'success' : 'error');
+            }
+        }
+
+        function validateCheckoutForm() {
+            clearErrors();
+            let isValid = true;
+            const user = getUser();
+
+            const recipientName = document.getElementById('recipientName').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const shippingAddress = document.getElementById('shippingAddress').value.trim();
+            const paymentMethod = document.querySelector('input[name="payment"]:checked');
+
+            if (!user.username || !user.email) {
+                profileWarning.classList.add('show');
+                isValid = false;
+            }
+
+            if (!recipientName) {
+                document.getElementById('recipientNameError').textContent = 'Nama penerima wajib diisi.';
+                isValid = false;
+            }
+
+            if (!phoneNumber) {
+                document.getElementById('phoneNumberError').textContent = 'Nomor HP wajib diisi.';
+                isValid = false;
+            }
+
+            if (!shippingAddress) {
+                document.getElementById('shippingAddressError').textContent = 'Alamat lengkap wajib diisi.';
+                isValid = false;
+            }
+
+            if (!paymentMethod) {
+                document.getElementById('paymentError').textContent = 'Metode pembayaran wajib dipilih.';
+                if (window.showToast) showToast('Metode pembayaran belum dipilih.', 'warning');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                showMessage('Periksa kembali data checkout Anda.');
+            }
+
+            return isValid;
+        }
+
+        function setLoading(isLoading) {
+            submitButton.disabled = isLoading;
+            submitButton.textContent = isLoading ? 'Memproses...' : 'Buat Pesanan';
+        }
+
+        async function submitCheckout() {
+            const cart = getCart();
+            if (cart.length === 0 || !validateCheckoutForm()) return;
+
+            const user = getUser();
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            const totalPayment = productTotalValue + SHIPPING_COST;
+
+            setLoading(true);
+
+            const payload = {
+                user_id: user.id || 1,
+                items: checkoutItemsList,
+                total_harga: totalPayment,
+                metode_pembayaran: paymentMethod
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Gagal membuat pesanan.');
+                }
+
+                localStorage.removeItem('cart');
+                showMessage('Pesanan berhasil dibuat.', 'success');
+                setTimeout(() => {
+                    window.location.href = 'history.html';
+                }, 700);
+            } catch (error) {
+                showMessage('Gagal membuat pesanan. Pastikan server backend berjalan.');
+                setLoading(false);
+            }
+        }
+
+        submitButton.addEventListener('click', submitCheckout);
+
+        renderBuyerData();
+        renderOrderSummary();
+    </script>
+</body>
+</html>

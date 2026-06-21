@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Produk</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../Assect/Css/style.css">
+    <link rel="stylesheet" href="../Assect/Css/toast.css">
+    <script src="../Assect/Js/toast.js"></script>
+    <style>
+        .detail-page-body {
+            background-color: var(--bg-surface);
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+        
+        .detail-container {
+            max-width: 1080px;
+            margin: 30px auto;
+            padding: 24px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            display: grid;
+            grid-template-columns: minmax(280px, 1fr) minmax(320px, 1fr);
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        .back-nav {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .back-nav:hover {
+            color: var(--primary);
+        }
+
+        .back-nav svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .detail-image-box {
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #F8FAFC;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            position: relative;
+            min-height: 420px;
+        }
+
+        .detail-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(0.9);
+            opacity: 0;
+            animation: zoomInSmooth 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes zoomInSmooth {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .detail-info {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-category {
+            width: fit-content;
+            max-width: 100%;
+            color: var(--primary);
+            background-color: rgba(47, 128, 237, 0.1);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .detail-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            line-height: 1.25;
+        }
+
+        .detail-price {
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 18px;
+        }
+
+        .detail-desc {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .cart-btn {
+            flex: 1;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(47, 128, 237, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .cart-btn:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(47, 128, 237, 0.25);
+        }
+
+        .buy-now-btn {
+            flex: 1;
+            padding: 14px;
+            background-color: var(--success);
+            color: white;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .buy-now-btn:hover {
+            background-color: var(--success-hover);
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(39, 174, 96, 0.25);
+        }
+
+        /* Toast feedback */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #1E293B;
+            color: #FFFFFF;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+            opacity: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .detail-status {
+            max-width: 1080px;
+            margin: 30px auto;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            background-color: var(--card-bg);
+            color: var(--text-muted);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .detail-status.error {
+            color: #B42318;
+            background-color: #FEF3F2;
+            border-color: #FECDCA;
+        }
+
+        .detail-status.loading .loading-spinner {
+            margin-bottom: 12px;
+        }
+
+        .cart-btn:disabled,
+        .buy-now-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 600px) {
+            .detail-container {
+                grid-template-columns: 1fr;
+                margin: 15px;
+                padding: 16px;
+                gap: 18px;
+            }
+            .detail-image-box {
+                min-height: 280px;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .cart-btn, .buy-now-btn {
+                width: 100%;
+            }
+            .detail-name {
+                font-size: 1.35rem;
+            }
+            .detail-price {
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+</head>
+<body class="detail-page-body">
+    <header class="site-header">
+        <a href="../home.html" class="brand">Marketplace</a>
+        <div class="header-actions">
+            <a href="cart.html" class="icon-btn" aria-label="Keranjang">
+                <i data-lucide="shopping-cart"></i>
+            </a>
+            <a href="profile.html" class="icon-btn" aria-label="Profil">
+                <i data-lucide="user"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="home-page">
+        <a href="../home.html" class="back-nav">
+            <i data-lucide="arrow-left"></i>
+            <span>Kembali ke Beranda</span>
+        </a>
+
+        <div id="detail-status" class="detail-status loading">
+            <div class="loading-spinner"></div>
+            <span>Memuat detail produk...</span>
+        </div>
+
+        <section class="detail-container" id="detail-container" style="display: none;">
+            <div class="detail-image-box">
+                <img id="product-img" src="" alt="Gambar Produk" class="detail-image">
+            </div>
+            
+            <div class="detail-info">
+                <p id="product-category" class="detail-category"></p>
+                <h1 id="product-name" class="detail-name">Loading...</h1>
+                <p id="product-price" class="detail-price">Rp 0</p>
+                <p id="product-desc" class="detail-desc">Memuat deskripsi produk...</p>
+
+                <div class="action-buttons">
+                    <button class="btn cart-btn" id="btn-add-cart">Tambah ke Keranjang</button>
+                    <button class="btn buy-now-btn" id="btn-buy-now">Beli Sekarang</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast">
+        <i data-lucide="check-circle" style="color: #4ADE80; width: 18px; height: 18px;"></i>
+        <span id="toast-msg">Item ditambahkan ke keranjang!</span>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons jika CDN berhasil dimuat.
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        const API_BASE = "http://localhost:3000/api";
+        const BASE_URL = "http://localhost:3000";
+        let currentProduct = null;
+
+        const detailStatus = document.getElementById('detail-status');
+        const detailContainer = document.getElementById('detail-container');
+        const productImg = document.getElementById('product-img');
+        const productCategory = document.getElementById('product-category');
+        const productName = document.getElementById('product-name');
+        const productPrice = document.getElementById('product-price');
+        const productDesc = document.getElementById('product-desc');
+
+        function formatRupiah(number) {
+            return "Rp " + Number(number || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function escapeHTML(text) {
+            return String(text ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getProductIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get("id");
+        }
+
+        function getDetailImagePath(imagePath) {
+            if (!imagePath) return '../Assect/Img/backpack.png';
+            if (imagePath.startsWith('http')) return imagePath;
+            if (imagePath.startsWith('/uploads')) return BASE_URL + imagePath;
+            if (imagePath.startsWith('../')) {
+                return imagePath;
+            }
+            if (imagePath.startsWith('./')) {
+                return '.' + imagePath;
+            }
+            return '../' + imagePath;
+        }
+
+        function normalizeProduct(product) {
+            return {
+                id: product.produk_id || product.id,
+                name: product.nama_barang || product.name || 'Produk tanpa nama',
+                category: product.kategori || 'Lainnya',
+                price: parseInt(product.harga || product.price) || 0,
+                description: product.deskripsi || 'Belum ada deskripsi produk.',
+                image: getDetailImagePath(product.image || product.gambar)
+            };
+        }
+
+        function showStatus(message, type = '') {
+            detailStatus.innerHTML = type === 'loading'
+                ? `<div class="loading-spinner"></div><span>${escapeHTML(message)}</span>`
+                : escapeHTML(message);
+            detailStatus.className = `detail-status ${type}`;
+            detailStatus.style.display = 'block';
+            detailContainer.style.display = 'none';
+        }
+
+        function renderProductDetail(product) {
+            currentProduct = normalizeProduct(product);
+
+            productImg.src = currentProduct.image;
+            productImg.alt = currentProduct.name;
+            productCategory.textContent = currentProduct.category;
+            productName.textContent = currentProduct.name;
+            productPrice.textContent = formatRupiah(currentProduct.price);
+            productDesc.textContent = currentProduct.description;
+            document.title = currentProduct.name + " - Detail Produk";
+
+            detailStatus.style.display = 'none';
+            detailContainer.style.display = 'grid';
+        }
+
+        async function fetchProductDetail() {
+            const productId = getProductIdFromURL();
+
+            if (!productId) {
+                showStatus('Produk tidak ditemukan.', 'error');
+                if (window.showToast) showToast('Produk tidak ditemukan.', 'warning');
+                return;
+            }
+
+            showStatus('Memuat detail produk...', 'loading');
+
+            try {
+                const response = await fetch(`${API_BASE}/products/${productId}`);
+                const data = await response.json();
+
+                if (!response.ok || !data.success || !data.product) {
+                    throw new Error(data.message || 'Produk tidak ditemukan.');
+                }
+
+                renderProductDetail(data.product);
+            } catch (error) {
+                const message = error.message === 'Produk tidak ditemukan.'
+                    ? 'Produk tidak ditemukan.'
+                    : 'Gagal memuat detail produk.';
+                showStatus(message, 'error');
+                if (window.showToast) showToast(message, 'error');
+            }
+        }
+
+        // Ripple Effect Helper
+        function triggerRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement("span");
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+            circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+            circle.classList.add("ripple");
+            
+            const oldRipple = button.querySelector(".ripple");
+            if (oldRipple) {
+                oldRipple.remove();
+            }
+            
+            button.appendChild(circle);
+        }
+
+        // Wrapper toast: gunakan toast global jika tersedia, fallback ke toast lama halaman ini.
+        function showDetailToast(message, type = 'info') {
+            if (window.AppToastShow) {
+                AppToastShow(message, type);
+                return;
+            }
+
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function addToCart() {
+            if (!currentProduct) return;
+
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart = Array.isArray(cart) ? cart : Object.values(cart).filter(item => item && typeof item === 'object');
+
+            const existingItem = cart.find(item => String(item.id) === String(currentProduct.id));
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({
+                    id: currentProduct.id,
+                    name: currentProduct.name,
+                    price: currentProduct.price,
+                    image: currentProduct.image,
+                    category: currentProduct.category,
+                    qty: 1
+                });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function setActionLoading(button, isLoading, loadingText) {
+            button.disabled = isLoading;
+            button.textContent = isLoading ? loadingText : button.dataset.defaultText;
+        }
+
+        // Action: Tambah ke Keranjang
+        document.getElementById('btn-add-cart').addEventListener('click', function(e) {
+            triggerRipple(e);
+            this.dataset.defaultText = this.dataset.defaultText || this.textContent;
+            setActionLoading(this, true, 'Memproses...');
+            addToCart();
+            showDetailToast(currentProduct.name + " ditambahkan ke keranjang!", 'success');
+            setTimeout(() => setActionLoading(this, false), 350);
+        });
+
+        // Action: Beli Sekarang
+        document.getElementById('btn-buy-now').addEventListener('click', function(e) {
+            triggerRipple(e);
+            this.dataset.defaultText = this.dataset.defaultText || this.textContent;
+            setActionLoading(this, true, 'Memproses...');
+            addToCart();
+            showDetailToast(currentProduct.name + " ditambahkan ke keranjang.", 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'cart.html';
+            }, 300);
+        });
+
+        fetchProductDetail();
+    </script>
+</body>
+</html>
